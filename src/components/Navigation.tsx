@@ -24,10 +24,14 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-light to-primary-dark rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold font-montserrat text-xl">C</span>
-            </div>
+          <Link to="/" className="flex items-center space-x-2">           
+            <div className="w-10 h-10 bg-gradient-to-br from-primary-light to-white rounded-lg flex items-center justify-center overflow-hidden">
+                <img
+                  src="/logo_catuh.jpg"
+                  alt="Logo CATUH"
+                  className="w-8 h-8 object-cover scale-150"
+                />
+              </div>
             <div className="flex flex-col">
               <span className="font-montserrat font-bold text-primary-dark text-lg">CATUH</span>
               <span className="font-inter text-xs text-gray-600 hidden sm:block">Casa Assistencial Trabalhadores</span>

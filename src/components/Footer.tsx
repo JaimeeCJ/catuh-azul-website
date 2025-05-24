@@ -9,8 +9,12 @@ const Footer = () => {
           {/* Logo and Description */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-light to-white rounded-lg flex items-center justify-center">
-                <span className="text-primary-dark font-bold font-montserrat text-xl">C</span>
+              <div className="w-10 h-10 bg-gradient-to-br from-primary-light to-white rounded-lg flex items-center justify-center overflow-hidden">
+                <img
+                  src="/logo_catuh.jpg"
+                  alt="Logo CATUH"
+                  className="w-8 h-8 object-cover scale-150"
+                />
               </div>
               <div className="flex flex-col">
                 <span className="font-montserrat font-bold text-white text-lg">CATUH</span>
@@ -39,22 +43,22 @@ const Footer = () => {
             <h3 className="font-montserrat font-semibold text-lg mb-4">Contato</h3>
             <div className="space-y-2 font-inter text-gray-300">
               <p>Barretos, São Paulo</p>
-              <p>contato@catuh.org.br</p>
+              <p>trabalhadoresultimahora@hotmail.com</p>
               <p>(17) 3322-1234</p>
             </div>
             
             {/* Social Media */}
             <div className="flex space-x-4 mt-4">
-              <a href="#" className="text-gray-300 hover:text-primary-light transition-colors">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-300 hover:text-primary-light transition-colors">
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-300 hover:text-primary-light transition-colors">
-                <Linkedin className="h-5 w-5" />
-              </a>
-            </div>
+            <a 
+              href="https://www.instagram.com/casa_assistencialstc/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="text-gray-300 hover:text-primary-light transition-colors"
+            >
+              <Instagram className="h-5 w-5" />
+            </a>
+          </div>
           </div>
         </div>
 
@@ -62,10 +66,10 @@ const Footer = () => {
         
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="font-inter text-gray-400 text-sm">
-            © 2024 CATUH - Casa Assistencial Trabalhadores da Última Hora. Todos os direitos reservados.
+            © 2025 CATUH - Casa Assistencial Trabalhadores da Última Hora. Todos os direitos reservados.
           </p>
           <p className="font-inter text-gray-400 text-sm mt-2 md:mt-0">
-            CNPJ: 12.345.678/0001-99
+            CNPJ: 04.259.387/0001-56
           </p>
         </div>
       </div>

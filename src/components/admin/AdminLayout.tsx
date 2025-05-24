@@ -1,4 +1,3 @@
-
 import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import AdminSidebar from "./AdminSidebar";
@@ -10,11 +9,10 @@ const AdminLayout = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Simular verificação de autenticação
-    const adminToken = localStorage.getItem('admin_token');
+    const adminToken = localStorage.getItem("admin_token");
     setIsAuthenticated(!!adminToken);
     setIsLoading(false);
-  }, []);
+  }, [location.pathname]);
 
   if (isLoading) {
     return (
@@ -27,18 +25,22 @@ const AdminLayout = () => {
     );
   }
 
-  if (!isAuthenticated && location.pathname !== '/admin/login') {
-    return <Navigate to="/admin/login" replace />;
-  }
-
-  if (isAuthenticated && location.pathname === '/admin/login') {
+  // Se estiver autenticado e na login, redireciona
+  if (isAuthenticated && location.pathname === "/admin/login") {
     return <Navigate to="/admin" replace />;
   }
 
-  if (location.pathname === '/admin/login') {
+  // Se não autenticado e não estiver na login, redireciona pra login
+  if (!isAuthenticated && location.pathname !== "/admin/login") {
+    return <Navigate to="/admin/login" replace />;
+  }
+
+  // Aqui é só pra rota de login
+  if (!isAuthenticated && location.pathname === "/admin/login") {
     return <Outlet />;
   }
 
+  // Aqui é pra qualquer rota autenticada
   return (
     <div className="min-h-screen bg-gray-50 flex">
       <AdminSidebar />
