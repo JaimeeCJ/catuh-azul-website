@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Transparency from "./pages/Transparency";
 import Workshops from "./pages/Workshops";
+import WorkshopDetail from "./pages/WorkshopDetail";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -21,7 +22,6 @@ import AdminContacts from "./pages/admin/AdminContacts";
 import AdminMedia from "./pages/admin/AdminMedia";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminEditWorkshop from "./pages/admin/AdminEditWorkShop";
-
 
 const queryClient = new QueryClient();
 
@@ -37,6 +37,7 @@ const App = () => (
             <Route path="about" element={<About />} />
             <Route path="transparency" element={<Transparency />} />
             <Route path="workshops" element={<Workshops />} />
+            <Route path="workshops/:id" element={<WorkshopDetail />} />
             <Route path="contact" element={<Contact />} />
           </Route>
           
