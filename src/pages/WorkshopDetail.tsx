@@ -53,6 +53,19 @@ const WorkshopDetail = () => {
     navigate("/contact", { state: { workshopTitle: workshop?.TituloTx } });
   };
 
+  // Função para converter BLOB em URL de imagem
+  const getBlobImageUrl = (blob) => {
+    if (!blob) return null;
+    const byteCharacters = atob(blob);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const imageBlob = new Blob([byteArray], { type: 'image/jpeg' });
+    return URL.createObjectURL(imageBlob);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -144,11 +157,11 @@ const WorkshopDetail = () => {
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* Workshop Image */}
-              {workshop.ImagemUrlTx && (
+              {workshop.ImagemBlob && (
                 <Card>
                   <CardContent className="p-0">
                     <img 
-                      src={workshop.ImagemUrlTx} 
+                      src={getBlobImageUrl(workshop.ImagemBlob)} 
                       alt={workshop.TituloTx}
                       className="w-full h-64 md:h-80 object-cover rounded-lg"
                     />
@@ -156,47 +169,52 @@ const WorkshopDetail = () => {
                 </Card>
               )}
 
-              {/* Description */}
+              {/* Detailed Description */}
               <Card>
                 <CardHeader>
                   <CardTitle className="font-montserrat">Sobre o Workshop</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="font-inter text-gray-700 leading-relaxed">
-                    {workshop.DescricaoDs}
+                  <p className="font-inter text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {workshop.DescricaoDetalhadaDs || workshop.DescricaoDs}
                   </p>
                 </CardContent>
               </Card>
 
-              {/* Program/Schedule placeholder */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="font-montserrat">Programa do Curso</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="font-inter text-gray-700 mb-4">
-                    Este workshop oferece uma formação completa e prática, abordando conceitos fundamentais e aplicações práticas.
-                  </p>
-                  <ul className="space-y-2 text-gray-700">
-                    <li className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                      <span>Conceitos teóricos fundamentais</span>
-                    </li>
-                    <li className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                      <span>Exercícios práticos supervisionados</span>
-                    </li>
-                    <li className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                      <span>Material didático incluso</span>
-                    </li>
-                    <li className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                      <span>Certificado de participação</span>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
+              {/* Program/Schedule */}
+              {workshop.CronogramaDs && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="font-montserrat">Programa do Curso</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="font-inter text-gray-700 whitespace-pre-wrap">
+                      {workshop.CronogramaDs}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Gallery */}
+              {workshop.galeria && workshop.galeria.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="font-montserrat">Galeria de Fotos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {workshop.galeria.map((foto, index) => (
+                        <img
+                          key={index}
+                          src={getBlobImageUrl(foto.ImagemBlob)}
+                          alt={`Foto ${index + 1} do workshop`}
+                          className="w-full h-48 object-cover rounded-lg"
+                        />
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -212,19 +230,33 @@ const WorkshopDetail = () => {
                     <div>
                       <p className="font-medium">Data de Início</p>
                       <p className="text-sm text-gray-600">
-                        {workshop.DtPublicacaoDt ? 
-                          new Date(workshop.DtPublicacaoDt).toLocaleDateString('pt-BR') : 
+                        {workshop.DataInicioDt ? 
+                          new Date(workshop.DataInicioDt).toLocaleDateString('pt-BR') : 
                           "A definir"
                         }
                       </p>
                     </div>
                   </div>
                   
+                  {workshop.DataFimDt && (
+                    <div className="flex items-center space-x-3">
+                      <Calendar className="h-5 w-5 text-blue-600" />
+                      <div>
+                        <p className="font-medium">Data de Término</p>
+                        <p className="text-sm text-gray-600">
+                          {new Date(workshop.DataFimDt).toLocaleDateString('pt-BR')}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="flex items-center space-x-3">
                     <Clock className="h-5 w-5 text-blue-600" />
                     <div>
                       <p className="font-medium">Duração</p>
-                      <p className="text-sm text-gray-600">40 horas</p>
+                      <p className="text-sm text-gray-600">
+                        {workshop.DuracaoHorasNr || 40} horas
+                      </p>
                     </div>
                   </div>
                   
@@ -232,7 +264,9 @@ const WorkshopDetail = () => {
                     <Users className="h-5 w-5 text-blue-600" />
                     <div>
                       <p className="font-medium">Vagas</p>
-                      <p className="text-sm text-gray-600">15 participantes</p>
+                      <p className="text-sm text-gray-600">
+                        {workshop.NumeroVagasNr || 15} participantes
+                      </p>
                     </div>
                   </div>
                   
@@ -240,7 +274,9 @@ const WorkshopDetail = () => {
                     <MapPin className="h-5 w-5 text-blue-600" />
                     <div>
                       <p className="font-medium">Local</p>
-                      <p className="text-sm text-gray-600">CATUH - Barretos/SP</p>
+                      <p className="text-sm text-gray-600">
+                        {workshop.LocalRealizacaoTx || "CATUH - Barretos/SP"}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -276,16 +312,18 @@ const WorkshopDetail = () => {
               </Card>
 
               {/* Requirements */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="font-montserrat">Pré-requisitos</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-700">
-                    Não há pré-requisitos específicos. O curso é aberto a pessoas de todas as idades e níveis de conhecimento.
-                  </p>
-                </CardContent>
-              </Card>
+              {workshop.PreRequisitosDs && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="font-montserrat">Pré-requisitos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                      {workshop.PreRequisitosDs}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </div>

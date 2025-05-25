@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,8 +18,11 @@ const AdminWorkshops = () => {
   const [form, setForm] = useState({
     TituloTx: "",
     DescricaoDs: "",
-    ImagemUrlTx: "",
+    DescricaoDetalhadaDs: "",
     DtPublicacaoDt: "",
+    DuracaoHorasNr: "40",
+    NumeroVagasNr: "15",
+    StatusAtivoFl: true,
   });
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +37,11 @@ const AdminWorkshops = () => {
 
   // Handle input change for the form
   function handleFormChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setForm({ 
+      ...form, 
+      [name]: type === 'checkbox' ? checked : value 
+    });
   }
 
   // Add new activity via API (POST)
@@ -50,8 +58,11 @@ const AdminWorkshops = () => {
       setForm({
         TituloTx: "",
         DescricaoDs: "",
-        ImagemUrlTx: "",
+        DescricaoDetalhadaDs: "",
         DtPublicacaoDt: "",
+        DuracaoHorasNr: "40",
+        NumeroVagasNr: "15",
+        StatusAtivoFl: true,
       });
       setShowForm(false);
       toast({
@@ -135,30 +146,68 @@ const AdminWorkshops = () => {
                     required
                   />
                 </div>
-                <div className="md:col-span-2">
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    URL da Imagem (opcional)
+                    Duração (horas)
                   </label>
                   <Input
-                    name="ImagemUrlTx"
-                    value={form.ImagemUrlTx}
+                    name="DuracaoHorasNr"
+                    type="number"
+                    value={form.DuracaoHorasNr}
                     onChange={handleFormChange}
-                    placeholder="https://..."
+                    placeholder="40"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Número de Vagas
+                  </label>
+                  <Input
+                    name="NumeroVagasNr"
+                    type="number"
+                    value={form.NumeroVagasNr}
+                    onChange={handleFormChange}
+                    placeholder="15"
                   />
                 </div>
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Descrição
+                  Descrição Resumida
                 </label>
                 <Textarea
                   name="DescricaoDs"
-                  placeholder="Descreva o conteúdo e objetivos do workshop..."
-                  rows={4}
+                  placeholder="Descrição curta para listagem..."
+                  rows={3}
                   value={form.DescricaoDs}
                   onChange={handleFormChange}
                   required
                 />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Descrição Detalhada
+                </label>
+                <Textarea
+                  name="DescricaoDetalhadaDs"
+                  placeholder="Descrição completa do workshop, objetivos, metodologia..."
+                  rows={4}
+                  value={form.DescricaoDetalhadaDs}
+                  onChange={handleFormChange}
+                />
+              </div>
+              <div className="flex items-center space-x-2 mb-4">
+                <input
+                  type="checkbox"
+                  id="StatusAtivoFl"
+                  name="StatusAtivoFl"
+                  checked={form.StatusAtivoFl}
+                  onChange={handleFormChange}
+                  className="rounded"
+                />
+                <label htmlFor="StatusAtivoFl" className="text-sm font-medium text-gray-700">
+                  Workshop ativo (visível no site)
+                </label>
               </div>
               <div className="flex space-x-2">
                 <Button type="submit">Salvar Workshop</Button>
@@ -184,6 +233,25 @@ const AdminWorkshops = () => {
                     <CardTitle className="font-montserrat text-lg">
                       {workshop.TituloTx}
                     </CardTitle>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        workshop.StatusAtivoFl !== false 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {workshop.StatusAtivoFl !== false ? 'Ativo' : 'Inativo'}
+                      </span>
+                      {workshop.DuracaoHorasNr && (
+                        <span className="text-xs text-gray-500">
+                          {workshop.DuracaoHorasNr}h
+                        </span>
+                      )}
+                      {workshop.NumeroVagasNr && (
+                        <span className="text-xs text-gray-500">
+                          {workshop.NumeroVagasNr} vagas
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex space-x-1">
                     <Button
@@ -205,14 +273,14 @@ const AdminWorkshops = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                {workshop.ImagemUrlTx && (
-                  <img src={workshop.ImagemUrlTx} alt="imagem do workshop" className="mb-3 rounded w-full max-h-40 object-cover" />
-                )}
                 <p className="text-gray-700 text-sm mb-2">{workshop.DescricaoDs}</p>
-                <div className="flex justify-end">
-                  <span className="text-sm text-gray-500">
+                <div className="flex justify-between items-center text-xs text-gray-500">
+                  <span>
                     Publicação: {workshop.DtPublicacaoDt ? workshop.DtPublicacaoDt.slice(0, 10) : "--"}
                   </span>
+                  {workshop.galeria && workshop.galeria.length > 0 && (
+                    <span>{workshop.galeria.length} foto(s)</span>
+                  )}
                 </div>
               </CardContent>
             </Card>

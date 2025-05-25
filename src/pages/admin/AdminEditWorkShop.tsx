@@ -17,16 +17,16 @@ export default function AdminEditWorkshop() {
   const [form, setForm] = useState({
     TituloTx: "",
     DescricaoDs: "",
-    DescricaoDetalhada: "",
+    DescricaoDetalhadaDs: "",
     DtPublicacaoDt: "",
-    DuracaoHoras: "",
-    NumeroVagas: "",
-    PreRequisitos: "",
-    LocalRealizacao: "",
-    DataInicio: "",
-    DataFim: "",
-    Cronograma: "",
-    StatusAtivo: true,
+    DuracaoHorasNr: "",
+    NumeroVagasNr: "",
+    PreRequisitosDs: "",
+    LocalRealizacaoTx: "",
+    DataInicioDt: "",
+    DataFimDt: "",
+    CronogramaDs: "",
+    StatusAtivoFl: true,
   });
   
   const [imagemFile, setImagemFile] = useState(null);
@@ -46,16 +46,16 @@ export default function AdminEditWorkshop() {
         setForm({
           TituloTx: data.TituloTx || "",
           DescricaoDs: data.DescricaoDs || "",
-          DescricaoDetalhada: data.DescricaoDetalhada || "",
+          DescricaoDetalhadaDs: data.DescricaoDetalhadaDs || "",
           DtPublicacaoDt: data.DtPublicacaoDt ? data.DtPublicacaoDt.slice(0, 10) : "",
-          DuracaoHoras: data.DuracaoHoras || "40",
-          NumeroVagas: data.NumeroVagas || "15",
-          PreRequisitos: data.PreRequisitos || "Não há pré-requisitos específicos",
-          LocalRealizacao: data.LocalRealizacao || "CATUH - Barretos/SP",
-          DataInicio: data.DataInicio ? data.DataInicio.slice(0, 10) : "",
-          DataFim: data.DataFim ? data.DataFim.slice(0, 10) : "",
-          Cronograma: data.Cronograma || "",
-          StatusAtivo: data.StatusAtivo !== false,
+          DuracaoHorasNr: data.DuracaoHorasNr || "40",
+          NumeroVagasNr: data.NumeroVagasNr || "15",
+          PreRequisitosDs: data.PreRequisitosDs || "Não há pré-requisitos específicos",
+          LocalRealizacaoTx: data.LocalRealizacaoTx || "CATUH - Barretos/SP",
+          DataInicioDt: data.DataInicioDt ? data.DataInicioDt.slice(0, 10) : "",
+          DataFimDt: data.DataFimDt ? data.DataFimDt.slice(0, 10) : "",
+          CronogramaDs: data.CronogramaDs || "",
+          StatusAtivoFl: data.StatusAtivoFl !== false,
         });
         setError("");
       })
@@ -105,10 +105,7 @@ export default function AdminEditWorkshop() {
       });
 
       const res = await fetch(`http://localhost:8000/api/atividades/${id}`, {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-        },
+        method: "PUT",
         body: formData,
       });
 
@@ -228,12 +225,12 @@ export default function AdminEditWorkshop() {
                 </div>
 
                 <div>
-                  <Label htmlFor="DescricaoDetalhada">Descrição Detalhada</Label>
+                  <Label htmlFor="DescricaoDetalhadaDs">Descrição Detalhada</Label>
                   <Textarea
-                    id="DescricaoDetalhada"
-                    name="DescricaoDetalhada"
+                    id="DescricaoDetalhadaDs"
+                    name="DescricaoDetalhadaDs"
                     rows={6}
-                    value={form.DescricaoDetalhada}
+                    value={form.DescricaoDetalhadaDs}
                     onChange={handleChange}
                     placeholder="Descrição completa do workshop, objetivos, metodologia..."
                   />
@@ -242,13 +239,13 @@ export default function AdminEditWorkshop() {
                 <div className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    id="StatusAtivo"
-                    name="StatusAtivo"
-                    checked={form.StatusAtivo}
+                    id="StatusAtivoFl"
+                    name="StatusAtivoFl"
+                    checked={form.StatusAtivoFl}
                     onChange={handleChange}
                     className="rounded"
                   />
-                  <Label htmlFor="StatusAtivo">Workshop ativo (visível no site)</Label>
+                  <Label htmlFor="StatusAtivoFl">Workshop ativo (visível no site)</Label>
                 </div>
               </CardContent>
             </Card>
@@ -262,33 +259,33 @@ export default function AdminEditWorkshop() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="DuracaoHoras">Duração (horas)</Label>
+                    <Label htmlFor="DuracaoHorasNr">Duração (horas)</Label>
                     <Input
-                      id="DuracaoHoras"
-                      name="DuracaoHoras"
+                      id="DuracaoHorasNr"
+                      name="DuracaoHorasNr"
                       type="number"
-                      value={form.DuracaoHoras}
+                      value={form.DuracaoHorasNr}
                       onChange={handleChange}
                       placeholder="40"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="NumeroVagas">Número de Vagas</Label>
+                    <Label htmlFor="NumeroVagasNr">Número de Vagas</Label>
                     <Input
-                      id="NumeroVagas"
-                      name="NumeroVagas"
+                      id="NumeroVagasNr"
+                      name="NumeroVagasNr"
                       type="number"
-                      value={form.NumeroVagas}
+                      value={form.NumeroVagasNr}
                       onChange={handleChange}
                       placeholder="15"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="LocalRealizacao">Local</Label>
+                    <Label htmlFor="LocalRealizacaoTx">Local</Label>
                     <Input
-                      id="LocalRealizacao"
-                      name="LocalRealizacao"
-                      value={form.LocalRealizacao}
+                      id="LocalRealizacaoTx"
+                      name="LocalRealizacaoTx"
+                      value={form.LocalRealizacaoTx}
                       onChange={handleChange}
                       placeholder="CATUH - Barretos/SP"
                     />
@@ -297,34 +294,34 @@ export default function AdminEditWorkshop() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="DataInicio">Data de Início</Label>
+                    <Label htmlFor="DataInicioDt">Data de Início</Label>
                     <Input
-                      id="DataInicio"
-                      name="DataInicio"
+                      id="DataInicioDt"
+                      name="DataInicioDt"
                       type="date"
-                      value={form.DataInicio}
+                      value={form.DataInicioDt}
                       onChange={handleChange}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="DataFim">Data de Término</Label>
+                    <Label htmlFor="DataFimDt">Data de Término</Label>
                     <Input
-                      id="DataFim"
-                      name="DataFim"
+                      id="DataFimDt"
+                      name="DataFimDt"
                       type="date"
-                      value={form.DataFim}
+                      value={form.DataFimDt}
                       onChange={handleChange}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="PreRequisitos">Pré-requisitos</Label>
+                  <Label htmlFor="PreRequisitosDs">Pré-requisitos</Label>
                   <Textarea
-                    id="PreRequisitos"
-                    name="PreRequisitos"
+                    id="PreRequisitosDs"
+                    name="PreRequisitosDs"
                     rows={3}
-                    value={form.PreRequisitos}
+                    value={form.PreRequisitosDs}
                     onChange={handleChange}
                     placeholder="Descreva os pré-requisitos necessários..."
                   />
@@ -340,12 +337,12 @@ export default function AdminEditWorkshop() {
               </CardHeader>
               <CardContent>
                 <div>
-                  <Label htmlFor="Cronograma">Cronograma/Programa</Label>
+                  <Label htmlFor="CronogramaDs">Cronograma/Programa</Label>
                   <Textarea
-                    id="Cronograma"
-                    name="Cronograma"
+                    id="CronogramaDs"
+                    name="CronogramaDs"
                     rows={8}
-                    value={form.Cronograma}
+                    value={form.CronogramaDs}
                     onChange={handleChange}
                     placeholder="Descreva o cronograma do curso, módulos, tópicos abordados..."
                   />
