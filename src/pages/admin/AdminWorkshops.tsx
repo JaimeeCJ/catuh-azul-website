@@ -1,64 +1,89 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Edit, Trash2, Users } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+
+const API_URL = "http://localhost:8000/api/atividades";
 
 const AdminWorkshops = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
-  const [workshops, setWorkshops] = useState([
-    {
-      id: "1",
-      title: "Informática Básica",
-      description: "Curso introdutório de informática para iniciantes",
-      duration: "40 horas",
-      participants: 25,
-      status: "Ativo",
-      startDate: "2024-02-01"
-    },
-    {
-      id: "2",
-      title: "Alfabetização de Adultos",
-      description: "Programa de alfabetização para adultos da comunidade",
-      duration: "60 horas",
-      participants: 18,
-      status: "Ativo",
-      startDate: "2024-01-15"
-    },
-    {
-      id: "3",
-      title: "Artesanato e Trabalhos Manuais",
-      description: "Workshop de artesanato para geração de renda",
-      duration: "30 horas",
-      participants: 12,
-      status: "Concluído",
-      startDate: "2023-11-01"
+  const [workshops, setWorkshops] = useState([]);
+  const [form, setForm] = useState({
+    TituloTx: "",
+    DescricaoDs: "",
+    ImagemUrlTx: "",
+    DtPublicacaoDt: "",
+  });
+  const [loading, setLoading] = useState(true);
+
+  // Fetch activities from Laravel API
+  useEffect(() => {
+    setLoading(true);
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => setWorkshops(data))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Handle input change for the form
+  function handleFormChange(e) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
+  // Add new activity via API (POST)
+  async function handleSaveWorkshop(e) {
+    e.preventDefault();
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    if (res.ok) {
+      const novo = await res.json();
+      setWorkshops((prev) => [...prev, novo]);
+      setForm({
+        TituloTx: "",
+        DescricaoDs: "",
+        ImagemUrlTx: "",
+        DtPublicacaoDt: "",
+      });
+      setShowForm(false);
+      toast({
+        title: "Workshop criado",
+        description: "O novo workshop foi adicionado com sucesso.",
+      });
+    } else {
+      toast({
+        title: "Erro ao criar workshop",
+        description: "Verifique os campos e tente novamente.",
+        variant: "destructive",
+      });
     }
-  ]);
+  }
 
-  const handleAddWorkshop = () => {
-    setShowForm(true);
-  };
-
-  const handleSaveWorkshop = () => {
-    setShowForm(false);
-    toast({
-      title: "Workshop criado",
-      description: "O novo workshop foi adicionado com sucesso.",
-    });
-  };
-
-  const handleDeleteWorkshop = (workshopId: string) => {
-    setWorkshops(workshops.filter(w => w.id !== workshopId));
-    toast({
-      title: "Workshop excluído",
-      description: "O workshop foi removido com sucesso.",
-    });
-  };
+  // Deleta atividade via API
+  async function handleDeleteWorkshop(atividadeId) {
+    const res = await fetch(`${API_URL}/${atividadeId}`, { method: "DELETE" });
+    if (res.ok) {
+      setWorkshops(workshops.filter((w) => w.AtividadeId !== atividadeId));
+      toast({
+        title: "Workshop excluído",
+        description: "O workshop foi removido com sucesso.",
+      });
+    } else {
+      toast({
+        title: "Erro ao excluir workshop",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -71,8 +96,7 @@ const AdminWorkshops = () => {
             Administre os cursos e workshops oferecidos pela CATUH
           </p>
         </div>
-        
-        <Button onClick={handleAddWorkshop} className="flex items-center space-x-2">
+        <Button onClick={() => setShowForm(true)} className="flex items-center space-x-2">
           <Plus className="h-4 w-4" />
           <span>Novo Workshop</span>
         </Button>
@@ -81,112 +105,119 @@ const AdminWorkshops = () => {
       {/* Formulário de Novo Workshop */}
       {showForm && (
         <Card>
-          <CardHeader>
-            <CardTitle className="font-montserrat">Novo Workshop</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Título do Workshop
-                </label>
-                <Input placeholder="Ex: Curso de Culinária" />
+          <form onSubmit={handleSaveWorkshop}>
+            <CardHeader>
+              <CardTitle className="font-montserrat">Novo Workshop</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Título do Workshop
+                  </label>
+                  <Input
+                    name="TituloTx"
+                    value={form.TituloTx}
+                    onChange={handleFormChange}
+                    placeholder="Ex: Curso de Culinária"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Data de Publicação
+                  </label>
+                  <Input
+                    name="DtPublicacaoDt"
+                    type="date"
+                    value={form.DtPublicacaoDt}
+                    onChange={handleFormChange}
+                    required
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    URL da Imagem (opcional)
+                  </label>
+                  <Input
+                    name="ImagemUrlTx"
+                    value={form.ImagemUrlTx}
+                    onChange={handleFormChange}
+                    placeholder="https://..."
+                  />
+                </div>
               </div>
-              
-              <div>
+              <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Duração
+                  Descrição
                 </label>
-                <Input placeholder="Ex: 20 horas" />
+                <Textarea
+                  name="DescricaoDs"
+                  placeholder="Descreva o conteúdo e objetivos do workshop..."
+                  rows={4}
+                  value={form.DescricaoDs}
+                  onChange={handleFormChange}
+                  required
+                />
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Data de Início
-                </label>
-                <Input type="date" />
+              <div className="flex space-x-2">
+                <Button type="submit">Salvar Workshop</Button>
+                <Button variant="outline" type="button" onClick={() => setShowForm(false)}>
+                  Cancelar
+                </Button>
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Máximo de Participantes
-                </label>
-                <Input type="number" placeholder="Ex: 20" />
-              </div>
-            </div>
-            
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Descrição
-              </label>
-              <Textarea
-                placeholder="Descreva o conteúdo e objetivos do workshop..."
-                rows={4}
-              />
-            </div>
-            
-            <div className="flex space-x-2">
-              <Button onClick={handleSaveWorkshop}>Salvar Workshop</Button>
-              <Button variant="outline" onClick={() => setShowForm(false)}>
-                Cancelar
-              </Button>
-            </div>
-          </CardContent>
+            </CardContent>
+          </form>
         </Card>
       )}
 
       {/* Lista de Workshops */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {workshops.map((workshop) => (
-          <Card key={workshop.id}>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="font-montserrat text-lg">{workshop.title}</CardTitle>
-                  <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                    <span className="flex items-center">
-                      <Users className="h-4 w-4 mr-1" />
-                      {workshop.participants} participantes
-                    </span>
-                    <span>Duração: {workshop.duration}</span>
+        {loading ? (
+          <div className="col-span-2 text-center py-8">Carregando...</div>
+        ) : (
+          workshops.map((workshop) => (
+            <Card key={workshop.AtividadeId}>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="font-montserrat text-lg">
+                      {workshop.TituloTx}
+                    </CardTitle>
+                  </div>
+                  <div className="flex space-x-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => navigate(`/admin/workshops/edit/${workshop.AtividadeId}`)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDeleteWorkshop(workshop.AtividadeId)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-                
-                <div className="flex space-x-1">
-                  <Button size="sm" variant="outline">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDeleteWorkshop(workshop.id)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+              </CardHeader>
+              <CardContent>
+                {workshop.ImagemUrlTx && (
+                  <img src={workshop.ImagemUrlTx} alt="imagem do workshop" className="mb-3 rounded w-full max-h-40 object-cover" />
+                )}
+                <p className="text-gray-700 text-sm mb-2">{workshop.DescricaoDs}</p>
+                <div className="flex justify-end">
+                  <span className="text-sm text-gray-500">
+                    Publicação: {workshop.DtPublicacaoDt ? workshop.DtPublicacaoDt.slice(0, 10) : "--"}
+                  </span>
                 </div>
-              </div>
-            </CardHeader>
-            
-            <CardContent>
-              <p className="text-gray-700 text-sm mb-4">{workshop.description}</p>
-              
-              <div className="flex justify-between items-center">
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  workshop.status === 'Ativo' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {workshop.status}
-                </span>
-                
-                <span className="text-sm text-gray-500">
-                  Início: {workshop.startDate}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
     </div>
   );

@@ -20,6 +20,8 @@ import AdminWorkshops from "./pages/admin/AdminWorkshops";
 import AdminContacts from "./pages/admin/AdminContacts";
 import AdminMedia from "./pages/admin/AdminMedia";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminEditWorkshop from "./pages/admin/AdminEditWorkShop";
+
 
 const queryClient = new QueryClient();
 
@@ -47,6 +49,7 @@ const App = () => (
             <Route path="contacts" element={<AdminContacts />} />
             <Route path="media" element={<AdminMedia />} />
             <Route path="settings" element={<AdminSettings />} />
+            <Route path="/admin/workshops/edit/:id" element={<AdminEditWorkshop />} />
           </Route>
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
