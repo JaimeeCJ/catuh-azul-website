@@ -8,7 +8,8 @@ import {
   Mail, 
   Image, 
   Settings,
-  Home
+  Home,
+  Tags
 } from "lucide-react";
 
 const AdminSidebar = () => {
@@ -17,6 +18,7 @@ const AdminSidebar = () => {
   const menuItems = [
     { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
     { name: "Páginas", path: "/admin/pages", icon: FileText },
+    { name: "Categorias", path: "/admin/categories", icon: Tags },
     { name: "Documentos", path: "/admin/documents", icon: FolderOpen },
     { name: "Workshops", path: "/admin/workshops", icon: GraduationCap },
     { name: "Contatos", path: "/admin/contacts", icon: Mail },

@@ -1,19 +1,8 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Plus, Edit, Trash2, FolderOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import CategoryForm from "@/components/admin/CategoryForm";
+import CategoryTable from "@/components/admin/CategoryTable";
 
 interface Category {
   id: number;
@@ -29,10 +18,6 @@ const AdminCategories = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [formData, setFormData] = useState({
-    nome: "",
-    descricao: ""
-  });
 
   const fetchCategories = async () => {
     try {
@@ -57,9 +42,7 @@ const AdminCategories = () => {
     fetchCategories();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleFormSubmit = async (formData: { nome: string; descricao: string }) => {
     if (!formData.nome.trim()) {
       toast({
         title: "Erro",
@@ -103,7 +86,6 @@ const AdminCategories = () => {
           });
         }
         
-        setFormData({ nome: "", descricao: "" });
         setIsEditing(false);
         setEditingCategory(null);
       }
@@ -118,10 +100,6 @@ const AdminCategories = () => {
   };
 
   const handleEdit = (category: Category) => {
-    setFormData({
-      nome: category.nome,
-      descricao: category.descricao || ""
-    });
     setEditingCategory(category);
     setIsEditing(true);
   };
@@ -150,13 +128,8 @@ const AdminCategories = () => {
   };
 
   const handleCancel = () => {
-    setFormData({ nome: "", descricao: "" });
     setIsEditing(false);
     setEditingCategory(null);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
   };
 
   if (loading) {
@@ -181,115 +154,18 @@ const AdminCategories = () => {
         </p>
       </div>
 
-      {/* Formulário de Categoria */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-montserrat">
-            {isEditing ? "Editar Categoria" : "Nova Categoria"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nome da Categoria *
-                </label>
-                <Input 
-                  placeholder="Ex: Atas de Reunião"
-                  value={formData.nome}
-                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Descrição
-                </label>
-                <Textarea 
-                  placeholder="Descrição da categoria (opcional)"
-                  value={formData.descricao}
-                  onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                  rows={3}
-                />
-              </div>
-            </div>
-            
-            <div className="flex space-x-2">
-              <Button type="submit" className="flex-1 sm:flex-none">
-                <Plus className="h-4 w-4 mr-2" />
-                {isEditing ? "Atualizar" : "Criar"} Categoria
-              </Button>
-              {isEditing && (
-                <Button type="button" variant="outline" onClick={handleCancel}>
-                  Cancelar
-                </Button>
-              )}
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+      <CategoryForm
+        isEditing={isEditing}
+        editingCategory={editingCategory}
+        onSubmit={handleFormSubmit}
+        onCancel={handleCancel}
+      />
 
-      {/* Lista de Categorias */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-montserrat">Categorias Existentes</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {categories.length === 0 ? (
-            <div className="text-center py-8">
-              <FolderOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Nenhuma categoria encontrada</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead className="hidden md:table-cell">Descrição</TableHead>
-                    <TableHead className="hidden sm:table-cell">Criado em</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {categories.map((category) => (
-                    <TableRow key={category.id}>
-                      <TableCell className="font-medium">{category.nome}</TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {category.descricao || "-"}
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        {formatDate(category.created_at)}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEdit(category)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDelete(category.id)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <CategoryTable
+        categories={categories}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
     </div>
   );
 };
