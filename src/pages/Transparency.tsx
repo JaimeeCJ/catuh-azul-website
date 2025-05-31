@@ -14,18 +14,19 @@ interface Document {
   updated_at: string;
 }
 
-const Transparency = () => {
-  const [activeTab, setActiveTab] = useState("1");
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [loading, setLoading] = useState(true);
+interface Category {
+  id: number;
+  nome: string;
+  descricao: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
-  const categories = {
-    "1": { name: "Atas de Reunião", description: "Documentos das reuniões da diretoria e assembleia geral" },
-    "2": { name: "Relatórios Financeiros", description: "Demonstrações financeiras e relatórios de auditoria" },
-    "3": { name: "Estatuto Social", description: "Documentos constitutivos e regimento interno" },
-    "4": { name: "Relatórios FEBRACT", description: "Documentos e certificações da Federação Brasileira de Comunidades Terapêuticas" },
-    "5": { name: "Comunidade Terapêutica Samaritano", description: "Licenciamentos, certificações e relatórios de atividades" }
-  };
+const Transparency = () => {
+  const [activeTab, setActiveTab] = useState("");
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchDocuments = async () => {
     try {
@@ -36,13 +37,31 @@ const Transparency = () => {
       }
     } catch (error) {
       console.error("Erro ao carregar documentos:", error);
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/categorias-documentos");
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data);
+        if (data.length > 0 && !activeTab) {
+          setActiveTab(data[0].id.toString());
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao carregar categorias:", error);
     }
   };
 
   useEffect(() => {
-    fetchDocuments();
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchDocuments(), fetchCategories()]);
+      setLoading(false);
+    };
+    loadData();
   }, []);
 
   const getDocumentsByCategory = (categoryId: string) => {
@@ -66,22 +85,22 @@ const Transparency = () => {
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3">
-            <FileText className="h-8 w-8 text-primary-dark" />
-            <div>
-              <CardTitle className="font-montserrat text-lg">{doc.nome}</CardTitle>
+          <div className="flex items-center space-x-3 min-w-0 flex-1">
+            <FileText className="h-8 w-8 text-primary-dark flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <CardTitle className="font-montserrat text-lg leading-tight">{doc.nome}</CardTitle>
               <CardDescription className="font-inter">
                 Data: {formatDate(doc.created_at)}
               </CardDescription>
             </div>
           </div>
-          <span className="bg-primary-light text-primary-dark px-2 py-1 rounded text-xs font-montserrat">
+          <span className="bg-primary-light text-primary-dark px-2 py-1 rounded text-xs font-montserrat flex-shrink-0 ml-2">
             {getFileExtension(doc.caminho)}
           </span>
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="flex space-x-2">
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
           <Button 
             variant="outline" 
             size="sm" 
@@ -107,18 +126,18 @@ const Transparency = () => {
   if (loading) {
     return (
       <div className="animate-fade-in">
-        <section className="bg-gradient-to-r from-primary-light to-primary-dark text-white py-16">
+        <section className="bg-gradient-to-r from-primary-light to-primary-dark text-white py-12 sm:py-16">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="font-montserrat font-bold text-4xl md:text-5xl mb-6">
+            <h1 className="font-montserrat font-bold text-3xl sm:text-4xl md:text-5xl mb-4 sm:mb-6">
               Transparência
             </h1>
-            <p className="font-inter text-lg md:text-xl max-w-3xl mx-auto">
+            <p className="font-inter text-base sm:text-lg md:text-xl max-w-3xl mx-auto">
               Acesse nossos documentos institucionais, relatórios financeiros e informações sobre nossa gestão com total transparência.
             </p>
           </div>
         </section>
         
-        <section className="py-16">
+        <section className="py-12 sm:py-16">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-center min-h-[400px]">
               <div className="text-center">
@@ -135,64 +154,84 @@ const Transparency = () => {
   return (
     <div className="animate-fade-in">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary-light to-primary-dark text-white py-16">
+      <section className="bg-gradient-to-r from-primary-light to-primary-dark text-white py-12 sm:py-16">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="font-montserrat font-bold text-4xl md:text-5xl mb-6">
+          <h1 className="font-montserrat font-bold text-3xl sm:text-4xl md:text-5xl mb-4 sm:mb-6">
             Transparência
           </h1>
-          <p className="font-inter text-lg md:text-xl max-w-3xl mx-auto">
+          <p className="font-inter text-base sm:text-lg md:text-xl max-w-3xl mx-auto">
             Acesse nossos documentos institucionais, relatórios financeiros e informações sobre nossa gestão com total transparência.
           </p>
         </div>
       </section>
 
       {/* Documents Section */}
-      <section className="py-16">
+      <section className="py-12 sm:py-16">
         <div className="container mx-auto px-4">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 mb-8">
-              {Object.entries(categories).map(([id, category]) => (
-                <TabsTrigger key={id} value={id} className="font-inter text-xs lg:text-sm">
-                  {category.name.split(' ')[0]}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+          {categories.length === 0 ? (
+            <div className="text-center py-12">
+              <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="font-montserrat text-lg text-gray-500 mb-2">
+                Nenhuma categoria disponível
+              </h3>
+              <p className="font-inter text-gray-400">
+                As categorias de documentos serão publicadas em breve.
+              </p>
+            </div>
+          ) : (
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <div className="overflow-x-auto mb-8">
+                <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-1 h-auto p-1">
+                  {categories.map((category) => (
+                    <TabsTrigger 
+                      key={category.id} 
+                      value={category.id.toString()} 
+                      className="font-inter text-xs sm:text-sm p-2 sm:p-3 whitespace-nowrap overflow-hidden text-ellipsis"
+                    >
+                      <span className="truncate">{category.nome}</span>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </div>
 
-            {Object.entries(categories).map(([categoryId, category]) => {
-              const categoryDocuments = getDocumentsByCategory(categoryId);
-              
-              return (
-                <TabsContent key={categoryId} value={categoryId} className="space-y-6">
-                  <div className="text-center mb-8">
-                    <h2 className="font-montserrat font-bold text-2xl text-primary-dark mb-2">
-                      {category.name}
-                    </h2>
-                    <p className="font-inter text-gray-600">
-                      {category.description}
-                    </p>
-                  </div>
-                  
-                  {categoryDocuments.length === 0 ? (
-                    <div className="text-center py-12">
-                      <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                      <h3 className="font-montserrat text-lg text-gray-500 mb-2">
-                        Nenhum documento disponível
-                      </h3>
-                      <p className="font-inter text-gray-400">
-                        Documentos desta categoria serão publicados em breve.
-                      </p>
+              {categories.map((category) => {
+                const categoryDocuments = getDocumentsByCategory(category.id.toString());
+                
+                return (
+                  <TabsContent key={category.id} value={category.id.toString()} className="space-y-6">
+                    <div className="text-center mb-8">
+                      <h2 className="font-montserrat font-bold text-xl sm:text-2xl text-primary-dark mb-2">
+                        {category.nome}
+                      </h2>
+                      {category.descricao && (
+                        <p className="font-inter text-gray-600">
+                          {category.descricao}
+                        </p>
+                      )}
                     </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {categoryDocuments.map((doc) => (
-                        <DocumentCard key={doc.id} doc={doc} />
-                      ))}
-                    </div>
-                  )}
-                </TabsContent>
-              );
-            })}
-          </Tabs>
+                    
+                    {categoryDocuments.length === 0 ? (
+                      <div className="text-center py-12">
+                        <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                        <h3 className="font-montserrat text-lg text-gray-500 mb-2">
+                          Nenhum documento disponível
+                        </h3>
+                        <p className="font-inter text-gray-400">
+                          Documentos desta categoria serão publicados em breve.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                        {categoryDocuments.map((doc) => (
+                          <DocumentCard key={doc.id} doc={doc} />
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                );
+              })}
+            </Tabs>
+          )}
         </div>
       </section>
     </div>

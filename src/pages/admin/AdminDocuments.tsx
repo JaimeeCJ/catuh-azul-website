@@ -5,6 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Upload, Download, Trash2, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Document {
   id: number;
@@ -15,21 +22,22 @@ interface Document {
   updated_at: string;
 }
 
+interface Category {
+  id: number;
+  nome: string;
+  descricao: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 const AdminDocuments = () => {
   const { toast } = useToast();
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [documentName, setDocumentName] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("1");
-
-  const categories = [
-    { id: "1", name: "Atas de Reunião" },
-    { id: "2", name: "Relatórios Financeiros" },
-    { id: "3", name: "Estatuto Social" },
-    { id: "4", name: "Relatórios FEBRACT" },
-    { id: "5", name: "Comunidade Terapêutica Samaritano" }
-  ];
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const fetchDocuments = async () => {
     try {
@@ -45,21 +53,44 @@ const AdminDocuments = () => {
         description: "Não foi possível carregar os documentos.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/categorias-documentos");
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data);
+        if (data.length > 0 && !selectedCategory) {
+          setSelectedCategory(data[0].id.toString());
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao carregar categorias:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar as categorias.",
+        variant: "destructive",
+      });
     }
   };
 
   useEffect(() => {
-    fetchDocuments();
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchDocuments(), fetchCategories()]);
+      setLoading(false);
+    };
+    loadData();
   }, []);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !documentName.trim()) {
+    if (!file || !documentName.trim() || !selectedCategory) {
       toast({
         title: "Erro",
-        description: "Por favor, selecione um arquivo e insira o nome do documento.",
+        description: "Por favor, selecione um arquivo, insira o nome do documento e escolha uma categoria.",
         variant: "destructive",
       });
       return;
@@ -133,7 +164,7 @@ const AdminDocuments = () => {
   };
 
   const getCategoryName = (categoryId: number) => {
-    return categories.find(c => c.id === categoryId.toString())?.name || "Categoria desconhecida";
+    return categories.find(c => c.id === categoryId)?.nome || "Categoria desconhecida";
   };
 
   const formatDate = (dateString: string) => {
@@ -168,7 +199,7 @@ const AdminDocuments = () => {
           <CardTitle className="font-montserrat">Adicionar Novo Documento</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Nome do Documento
@@ -184,21 +215,22 @@ const AdminDocuments = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Categoria
               </label>
-              <select 
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-              >
-                {categories.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map(category => (
+                    <SelectItem key={category.id} value={category.id.toString()}>
+                      {category.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-light transition-colors">
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 lg:p-8 text-center hover:border-primary-light transition-colors">
             <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600 mb-2">Clique para selecionar ou arraste o arquivo aqui</p>
             <p className="text-sm text-gray-400">PDF, DOC, DOCX até 10MB</p>
@@ -236,25 +268,26 @@ const AdminDocuments = () => {
           ) : (
             <div className="space-y-4">
               {documents.map((document) => (
-                <div key={document.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <div key={document.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-center space-x-4 mb-3 sm:mb-0">
+                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <FileText className="h-6 w-6 text-red-600" />
                     </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900">{document.nome}</h3>
-                      <p className="text-sm text-gray-500">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-medium text-gray-900 truncate">{document.nome}</h3>
+                      <p className="text-sm text-gray-500 truncate">
                         {getCategoryName(document.categoria_id)} • 
                         Enviado em {formatDate(document.created_at)}
                       </p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 sm:flex-shrink-0">
                     <Button 
                       size="sm" 
                       variant="outline"
                       onClick={() => handleDownload(document)}
+                      className="flex-1 sm:flex-none"
                     >
                       <Download className="h-4 w-4 mr-1" />
                       Download
