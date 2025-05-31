@@ -74,10 +74,12 @@ export default function AdminEditWorkshop() {
   }
 
   function handleFileChange(e) {
+    console.log(e.target.files[0]); 
     setImagemFile(e.target.files[0]);
   }
 
   function handleGaleriaChange(e) {
+    console.log(e.target.files); 
     setGaleriaFiles(Array.from(e.target.files));
   }
 
@@ -85,37 +87,36 @@ export default function AdminEditWorkshop() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    
+
     try {
       const formData = new FormData();
-      
-      // Adiciona todos os campos do formulário
+
+      formData.append('_method', 'PUT');
+
+
       Object.keys(form).forEach(key => {
         formData.append(key, form[key]);
       });
-      
-      // Adiciona imagem principal se selecionada
       if (imagemFile) {
         formData.append("ImagemBlob", imagemFile);
       }
       
-      // Adiciona imagens da galeria se selecionadas
       galeriaFiles.forEach((file, index) => {
         formData.append(`GaleriaImagens[${index}]`, file);
       });
-
+    
       const res = await fetch(`http://localhost:8000/api/atividades/${id}`, {
-        method: "PUT",
+        method: "POST", // <<< ATENÇÃO! método POST com _method=PUT no body
         body: formData,
       });
 
       if (!res.ok) throw new Error("Erro ao atualizar atividade");
-      
+
       toast({
         title: "Workshop atualizado!",
         description: "As alterações foram salvas com sucesso.",
       });
-      
+
       navigate("/admin/workshops");
     } catch (err) {
       setError(err.message || "Erro ao atualizar.");
