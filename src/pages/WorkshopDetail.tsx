@@ -53,17 +53,10 @@ const WorkshopDetail = () => {
     navigate("/contact", { state: { workshopTitle: workshop?.TituloTx } });
   };
 
-  // Função para converter BLOB em URL de imagem
-  const getBlobImageUrl = (blob) => {
-    if (!blob) return null;
-    const byteCharacters = atob(blob);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    const imageBlob = new Blob([byteArray], { type: 'image/jpeg' });
-    return URL.createObjectURL(imageBlob);
+  // Função para obter URL completa da imagem
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    return `http://localhost:8000/storage/${imagePath}`;
   };
 
   if (loading) {
@@ -161,9 +154,12 @@ const WorkshopDetail = () => {
                 <Card>
                   <CardContent className="p-0">
                     <img 
-                      src={getBlobImageUrl(workshop.ImagemBlob)} 
+                      src={getImageUrl(workshop.ImagemBlob)} 
                       alt={workshop.TituloTx}
                       className="w-full h-64 md:h-80 object-cover rounded-lg"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
                     />
                   </CardContent>
                 </Card>
@@ -205,10 +201,13 @@ const WorkshopDetail = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {workshop.galeria.map((foto, index) => (
                         <img
-                          key={index}
-                          src={getBlobImageUrl(foto.ImagemBlob)}
+                          key={foto.GaleriaId || index}
+                          src={getImageUrl(foto.ImagemBlob)}
                           alt={`Foto ${index + 1} do workshop`}
                           className="w-full h-48 object-cover rounded-lg"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
                         />
                       ))}
                     </div>

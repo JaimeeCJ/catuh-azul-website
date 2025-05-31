@@ -15,111 +15,73 @@ const Workshops = () => {
     fetch("http://localhost:8000/api/atividades")
       .then(res => res.json())
       .then(data => {
-        setWorkshops(data);
+        // Filtra apenas workshops ativos
+        const activeWorkshops = data.filter(workshop => workshop.StatusAtivoFl);
+        setWorkshops(activeWorkshops);
       })
       .catch(err => {
         console.error("Erro ao carregar workshops:", err);
-        // Fallback para dados estáticos se a API falhar
-        setWorkshops([
-          {
-            AtividadeId: 1,
-            TituloTx: "Informática Básica",
-            DescricaoDs: "Curso introdutório de informática para iniciantes, abordando conceitos básicos de computação, internet e ferramentas digitais.",
-            ImagemUrlTx: "",
-            DtPublicacaoDt: new Date().toISOString(),
-          },
-          {
-            AtividadeId: 2,
-            TituloTx: "Alfabetização de Adultos",
-            DescricaoDs: "Programa de alfabetização voltado para adultos que não tiveram a oportunidade de aprender a ler e escrever na idade apropriada.",
-            ImagemUrlTx: "",
-            DtPublicacaoDt: new Date().toISOString(),
-          }
-        ]);
+        setWorkshops([]);
       })
       .finally(() => setLoading(false));
   }, []);
 
-  const staticWorkshopsForDisplay = [
-    {
-      title: "Informática Básica",
-      description: "Curso introdutório de informática para iniciantes, abordando conceitos básicos de computação, internet e ferramentas digitais.",
-      duration: "40 horas",
-      participants: "15 vagas",
-      image: "💻",
-      category: "Tecnologia"
-    },
-    {
-      title: "Alfabetização de Adultos",
-      description: "Programa de alfabetização voltado para adultos que não tiveram a oportunidade de aprender a ler e escrever na idade apropriada.",
-      duration: "60 horas",
-      participants: "20 vagas",
-      image: "📚",
-      category: "Educação"
-    },
-    {
-      title: "Capacitação Profissional",
-      description: "Curso de desenvolvimento de habilidades profissionais, incluindo técnicas de entrevista, elaboração de currículo e postura profissional.",
-      duration: "30 horas",
-      participants: "25 vagas",
-      image: "👔",
-      category: "Profissional"
-    },
-    {
-      title: "Artesanato e Geração de Renda",
-      description: "Oficinas de artesanato com foco na geração de renda, ensinando técnicas de criação e comercialização de produtos artesanais.",
-      duration: "50 horas",
-      participants: "12 vagas",
-      image: "🎨",
-      category: "Arte"
-    },
-    {
-      title: "Educação Financeira",
-      description: "Curso sobre planejamento financeiro pessoal, controle de gastos, poupança e noções básicas de investimento.",
-      duration: "20 horas",
-      participants: "30 vagas",
-      image: "💰",
-      category: "Financeiro"
-    },
-    {
-      title: "Culinária Básica",
-      description: "Aulas práticas de culinária com foco em preparo de refeições nutritivas e econômicas para o dia a dia.",
-      duration: "35 horas",
-      participants: "16 vagas",
-      image: "👩‍🍳",
-      category: "Culinária"
-    }
-  ];
+  const getCategoryFromTitle = (title) => {
+    const titleLower = title.toLowerCase();
+    if (titleLower.includes('informática') || titleLower.includes('computador')) return 'Tecnologia';
+    if (titleLower.includes('alfabetização') || titleLower.includes('leitura')) return 'Educação';
+    if (titleLower.includes('profissional') || titleLower.includes('capacitação')) return 'Profissional';
+    if (titleLower.includes('artesanato') || titleLower.includes('arte')) return 'Arte';
+    if (titleLower.includes('financeira') || titleLower.includes('dinheiro')) return 'Financeiro';
+    if (titleLower.includes('culinária') || titleLower.includes('cozinha')) return 'Culinária';
+    return 'Workshop';
+  };
 
-  const WorkshopCard = ({ workshop, staticData }: { workshop?: any, staticData?: any }) => {
-    const data = workshop || staticData;
-    const isFromAPI = !!workshop;
+  const getEmojiFromCategory = (category) => {
+    switch (category) {
+      case 'Tecnologia': return '💻';
+      case 'Educação': return '📚';
+      case 'Profissional': return '👔';
+      case 'Arte': return '🎨';
+      case 'Financeiro': return '💰';
+      case 'Culinária': return '👩‍🍳';
+      default: return '📋';
+    }
+  };
+
+  const WorkshopCard = ({ workshop }) => {
+    const category = getCategoryFromTitle(workshop.TituloTx);
+    const emoji = getEmojiFromCategory(category);
     
     return (
       <Card className="hover:shadow-lg transition-shadow duration-300">
         <CardHeader>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-4xl">{staticData?.image || "📋"}</span>
+            <span className="text-4xl">{emoji}</span>
             <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-montserrat font-medium">
-              {staticData?.category || "Workshop"}
+              {category}
             </span>
           </div>
           <CardTitle className="font-montserrat text-xl">
-            {isFromAPI ? data.TituloTx : data.title}
+            {workshop.TituloTx}
           </CardTitle>
           <CardDescription className="font-inter">
-            {isFromAPI ? data.DescricaoDs : data.description}
+            {workshop.DescricaoDs}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between mb-4 text-sm text-gray-600">
             <div className="flex items-center space-x-1">
               <Clock className="h-4 w-4" />
-              <span className="font-inter">{staticData?.duration || "40 horas"}</span>
+              <span className="font-inter">
+                {workshop.DuracaoHorasNr ? `${workshop.DuracaoHorasNr} horas` : "40 horas"}
+              </span>
             </div>
             <div className="flex items-center space-x-1">
               <Users className="h-4 w-4" />
-              <span className="font-inter">{staticData?.participants || "15 vagas"}</span>
+              <span className="font-inter">
+                {workshop.NumeroVagasNr ? `${workshop.NumeroVagasNr} vagas` : "15 vagas"}
+              </span>
             </div>
           </div>
           <div className="space-y-2">
@@ -129,15 +91,7 @@ const Workshops = () => {
             <Button 
               variant="outline" 
               className="w-full font-montserrat font-medium"
-              onClick={() => {
-                if (isFromAPI && data.AtividadeId) {
-                  navigate(`/workshops/${data.AtividadeId}`);
-                } else {
-                  // For static workshops, navigate to a placeholder ID
-                  const staticId = staticWorkshopsForDisplay.findIndex(w => w.title === data.title) + 100;
-                  navigate(`/workshops/${staticId}`);
-                }
-              }}
+              onClick={() => navigate(`/workshops/${workshop.AtividadeId}`)}
             >
               Saiba Mais
             </Button>
@@ -213,29 +167,22 @@ const Workshops = () => {
               <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-gray-600">Carregando workshops...</p>
             </div>
+          ) : workshops.length === 0 ? (
+            <div className="text-center py-12">
+              <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-600 mb-2">Nenhum workshop disponível</h3>
+              <p className="text-gray-500">
+                No momento não há workshops ativos. Volte em breve para conferir novos cursos!
+              </p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Show API workshops first, then fill with static ones */}
-              {workshops.map((workshop, index) => {
-                const staticData = staticWorkshopsForDisplay[index] || staticWorkshopsForDisplay[0];
-                return (
-                  <WorkshopCard 
-                    key={workshop.AtividadeId || index} 
-                    workshop={workshop}
-                    staticData={staticData}
-                  />
-                );
-              })}
-              
-              {/* Fill remaining with static workshops if needed */}
-              {workshops.length < staticWorkshopsForDisplay.length && 
-                staticWorkshopsForDisplay.slice(workshops.length).map((staticWorkshop, index) => (
-                  <WorkshopCard 
-                    key={`static-${index}`} 
-                    staticData={staticWorkshop}
-                  />
-                ))
-              }
+              {workshops.map((workshop) => (
+                <WorkshopCard 
+                  key={workshop.AtividadeId} 
+                  workshop={workshop}
+                />
+              ))}
             </div>
           )}
         </div>
