@@ -158,7 +158,7 @@ const WorkshopDetail = () => {
                       alt={workshop.TituloTx}
                       className="w-full h-64 md:h-80 object-cover rounded-lg"
                       onError={(e) => {
-                        e.target.style.display = 'none';
+                        (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
                   </CardContent>
@@ -206,7 +206,7 @@ const WorkshopDetail = () => {
                           alt={`Foto ${index + 1} do workshop`}
                           className="w-full h-48 object-cover rounded-lg"
                           onError={(e) => {
-                            e.target.style.display = 'none';
+                            (e.target as HTMLImageElement).style.display = 'none';
                           }}
                         />
                       ))}
