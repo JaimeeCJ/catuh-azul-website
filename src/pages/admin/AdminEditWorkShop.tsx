@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -55,6 +56,8 @@ export default function AdminEditWorkshop() {
       const data = await atividadeRes.json();
       const galeriaData = await galeriaRes.json();
       
+      console.log('Galeria data:', galeriaData); // Para debug
+      
       setForm({
         TituloTx: data.TituloTx || "",
         DescricaoDs: data.DescricaoDs || "",
@@ -101,26 +104,49 @@ export default function AdminEditWorkshop() {
     setImagemFile(null);
   };
 
-  const handleRemoverImagemGaleria = async (imagemId) => {
+  const handleRemoverImagemGaleria = async (imagem) => {
+    console.log('Removendo imagem:', imagem); // Para debug
+    
+    // Usar o ID da imagem ou o índice baseado na estrutura dos dados
+    const imagemId = imagem.id || imagem.IdGaleria;
+    
+    if (!imagemId) {
+      toast({
+        title: "Erro ao remover",
+        description: "ID da imagem não encontrado.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const res = await fetch(`http://localhost:8000/api/galeria/${imagemId}`, {
         method: "DELETE",
       });
 
       if (res.ok) {
-        setGaleriaAtual(galeriaAtual.filter(img => img.id !== imagemId));
+        setGaleriaAtual(galeriaAtual.filter(img => 
+          (img.id || img.IdGaleria) !== imagemId
+        ));
         toast({
           title: "Imagem removida",
           description: "A imagem foi removida da galeria.",
         });
+      } else {
+        throw new Error("Erro na resposta do servidor");
       }
     } catch (error) {
+      console.error('Erro ao remover imagem:', error);
       toast({
         title: "Erro ao remover",
         description: "Não foi possível remover a imagem.",
         variant: "destructive",
       });
     }
+  };
+
+  const handleGerenciarGaleria = () => {
+    navigate(`/admin/workshops/gallery/${id}`);
   };
 
   async function handleSubmit(e) {
@@ -207,7 +233,7 @@ export default function AdminEditWorkshop() {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => navigate(`/admin/workshops/gallery/${id}`)}
+            onClick={handleGerenciarGaleria}
           >
             <Eye className="h-4 w-4 mr-2" />
             Gerenciar Galeria
@@ -474,7 +500,7 @@ export default function AdminEditWorkshop() {
                   {galeriaAtual.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {galeriaAtual.map((imagem, index) => (
-                        <div key={imagem.id || index} className="relative">
+                        <div key={imagem.id || imagem.IdGaleria || index} className="relative">
                           <img
                             src={getImageUrl(imagem.ImagemBlob || imagem.url)}
                             alt={`Galeria ${index + 1}`}
@@ -488,7 +514,7 @@ export default function AdminEditWorkshop() {
                             variant="destructive"
                             size="sm"
                             className="absolute top-1 right-1"
-                            onClick={() => handleRemoverImagemGaleria(imagem.id)}
+                            onClick={() => handleRemoverImagemGaleria(imagem)}
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>
