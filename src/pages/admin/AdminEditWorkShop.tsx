@@ -1,155 +1,58 @@
 
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { Trash2, Upload, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
+import { useWorkshopData } from "@/hooks/useWorkshopData";
+import WorkshopBasicInfo from "@/components/admin/workshop/WorkshopBasicInfo";
+import WorkshopDetails from "@/components/admin/workshop/WorkshopDetails";
+import WorkshopSchedule from "@/components/admin/workshop/WorkshopSchedule";
+import WorkshopImageManager from "@/components/admin/workshop/WorkshopImageManager";
 
 export default function AdminEditWorkshop() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
-  const [form, setForm] = useState({
-    TituloTx: "",
-    DescricaoDs: "",
-    DescricaoDetalhadaDs: "",
-    DtPublicacaoDt: "",
-    DuracaoHorasNr: "",
-    NumeroVagasNr: "",
-    PreRequisitosDs: "",
-    LocalRealizacaoTx: "",
-    DataInicioDt: "",
-    DataFimDt: "",
-    CronogramaDs: "",
-    StatusAtivoFl: true,
-  });
-  
-  const [imagemFile, setImagemFile] = useState(null);
-  const [galeriaFiles, setGaleriaFiles] = useState([]);
-  const [imagemAtual, setImagemAtual] = useState("");
-  const [galeriaAtual, setGaleriaAtual] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const {
+    form,
+    imagemFile,
+    setImagemFile,
+    galeriaFiles,
+    setGaleriaFiles,
+    imagemAtual,
+    setImagemAtual,
+    galeriaAtual,
+    loading,
+    setLoading,
+    error,
+    setError,
+    getImageUrl,
+    handleFormChange,
+    handleRemoverImagemGaleria,
+    toast
+  } = useWorkshopData(id || "");
 
-  // Função para obter URL da imagem
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return "";
-    if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:8000/storage/${imagePath}`;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.files?.[0]); 
+    setImagemFile(e.target.files?.[0] || null);
   };
 
-  // Carrega dados da atividade para edição
-  useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      fetch(`http://localhost:8000/api/atividades/${id}`),
-      fetch(`http://localhost:8000/api/atividades/${id}/galeria`).catch(() => ({ json: () => [] }))
-    ]).then(async ([atividadeRes, galeriaRes]) => {
-      if (!atividadeRes.ok) throw new Error("Atividade não encontrada");
-      
-      const data = await atividadeRes.json();
-      const galeriaData = await galeriaRes.json();
-      
-      console.log('Galeria data:', galeriaData); // Para debug
-      
-      setForm({
-        TituloTx: data.TituloTx || "",
-        DescricaoDs: data.DescricaoDs || "",
-        DescricaoDetalhadaDs: data.DescricaoDetalhadaDs || "",
-        DtPublicacaoDt: data.DtPublicacaoDt ? data.DtPublicacaoDt.slice(0, 10) : "",
-        DuracaoHorasNr: data.DuracaoHorasNr || "40",
-        NumeroVagasNr: data.NumeroVagasNr || "15",
-        PreRequisitosDs: data.PreRequisitosDs || "Não há pré-requisitos específicos",
-        LocalRealizacaoTx: data.LocalRealizacaoTx || "CATUH - Barretos/SP",
-        DataInicioDt: data.DataInicioDt ? data.DataInicioDt.slice(0, 10) : "",
-        DataFimDt: data.DataFimDt ? data.DataFimDt.slice(0, 10) : "",
-        CronogramaDs: data.CronogramaDs || "",
-        StatusAtivoFl: data.StatusAtivoFl !== false,
-      });
-      
-      setImagemAtual(data.ImagemBlob || "");
-      setGaleriaAtual(Array.isArray(galeriaData) ? galeriaData : []);
-      setError("");
-    }).catch((err) => {
-      setError(err.message || "Erro ao buscar atividade.");
-    }).finally(() => setLoading(false));
-  }, [id]);
-
-  function handleChange(e) {
-    const { name, value, type, checked } = e.target;
-    setForm({ 
-      ...form, 
-      [name]: type === 'checkbox' ? checked : value 
-    });
-  }
-
-  function handleFileChange(e) {
-    console.log(e.target.files[0]); 
-    setImagemFile(e.target.files[0]);
-  }
-
-  function handleGaleriaChange(e) {
+  const handleGaleriaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.files); 
-    setGaleriaFiles(Array.from(e.target.files));
-  }
+    setGaleriaFiles(e.target.files ? Array.from(e.target.files) : []);
+  };
 
   const handleRemoverImagemPrincipal = () => {
     setImagemAtual("");
     setImagemFile(null);
   };
 
-  const handleRemoverImagemGaleria = async (imagem) => {
-    console.log('Removendo imagem:', imagem); // Para debug
-    
-    // Usar o ID da imagem ou o índice baseado na estrutura dos dados
-    const imagemId = imagem.id || imagem.IdGaleria;
-    
-    if (!imagemId) {
-      toast({
-        title: "Erro ao remover",
-        description: "ID da imagem não encontrado.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const res = await fetch(`http://localhost:8000/api/galeria/${imagemId}`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        setGaleriaAtual(galeriaAtual.filter(img => 
-          (img.id || img.IdGaleria) !== imagemId
-        ));
-        toast({
-          title: "Imagem removida",
-          description: "A imagem foi removida da galeria.",
-        });
-      } else {
-        throw new Error("Erro na resposta do servidor");
-      }
-    } catch (error) {
-      console.error('Erro ao remover imagem:', error);
-      toast({
-        title: "Erro ao remover",
-        description: "Não foi possível remover a imagem.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleGerenciarGaleria = () => {
     navigate(`/admin/workshops/gallery/${id}`);
   };
 
-  async function handleSubmit(e) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -159,7 +62,7 @@ export default function AdminEditWorkshop() {
       formData.append('_method', 'PUT');
 
       Object.keys(form).forEach(key => {
-        formData.append(key, form[key]);
+        formData.append(key, (form as any)[key]);
       });
       
       if (imagemFile) {
@@ -183,7 +86,7 @@ export default function AdminEditWorkshop() {
       });
 
       navigate("/admin/workshops");
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message || "Erro ao atualizar.");
       toast({
         title: "Erro ao atualizar",
@@ -193,7 +96,7 @@ export default function AdminEditWorkshop() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -256,300 +159,28 @@ export default function AdminEditWorkshop() {
             <TabsTrigger value="midia">Imagens</TabsTrigger>
           </TabsList>
 
-          {/* ... keep existing code (basicos, detalhes, cronograma tabs) */}
           <TabsContent value="basicos">
-            <Card>
-              <CardHeader>
-                <CardTitle>Informações Básicas</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="TituloTx">Título do Workshop</Label>
-                    <Input
-                      id="TituloTx"
-                      name="TituloTx"
-                      value={form.TituloTx}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="DtPublicacaoDt">Data de Publicação</Label>
-                    <Input
-                      id="DtPublicacaoDt"
-                      name="DtPublicacaoDt"
-                      type="date"
-                      value={form.DtPublicacaoDt}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="DescricaoDs">Descrição Resumida</Label>
-                  <Textarea
-                    id="DescricaoDs"
-                    name="DescricaoDs"
-                    rows={3}
-                    value={form.DescricaoDs}
-                    onChange={handleChange}
-                    placeholder="Descrição curta para listagem..."
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="DescricaoDetalhadaDs">Descrição Detalhada</Label>
-                  <Textarea
-                    id="DescricaoDetalhadaDs"
-                    name="DescricaoDetalhadaDs"
-                    rows={6}
-                    value={form.DescricaoDetalhadaDs}
-                    onChange={handleChange}
-                    placeholder="Descrição completa do workshop, objetivos, metodologia..."
-                  />
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="StatusAtivoFl"
-                    name="StatusAtivoFl"
-                    checked={form.StatusAtivoFl}
-                    onChange={handleChange}
-                    className="rounded"
-                  />
-                  <Label htmlFor="StatusAtivoFl">Workshop ativo (visível no site)</Label>
-                </div>
-              </CardContent>
-            </Card>
+            <WorkshopBasicInfo form={form} onChange={handleFormChange} />
           </TabsContent>
 
           <TabsContent value="detalhes">
-            <Card>
-              <CardHeader>
-                <CardTitle>Detalhes do Workshop</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="DuracaoHorasNr">Duração (horas)</Label>
-                    <Input
-                      id="DuracaoHorasNr"
-                      name="DuracaoHorasNr"
-                      type="number"
-                      value={form.DuracaoHorasNr}
-                      onChange={handleChange}
-                      placeholder="40"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="NumeroVagasNr">Número de Vagas</Label>
-                    <Input
-                      id="NumeroVagasNr"
-                      name="NumeroVagasNr"
-                      type="number"
-                      value={form.NumeroVagasNr}
-                      onChange={handleChange}
-                      placeholder="15"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="LocalRealizacaoTx">Local</Label>
-                    <Input
-                      id="LocalRealizacaoTx"
-                      name="LocalRealizacaoTx"
-                      value={form.LocalRealizacaoTx}
-                      onChange={handleChange}
-                      placeholder="CATUH - Barretos/SP"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="DataInicioDt">Data de Início</Label>
-                    <Input
-                      id="DataInicioDt"
-                      name="DataInicioDt"
-                      type="date"
-                      value={form.DataInicioDt}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="DataFimDt">Data de Término</Label>
-                    <Input
-                      id="DataFimDt"
-                      name="DataFimDt"
-                      type="date"
-                      value={form.DataFimDt}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="PreRequisitosDs">Pré-requisitos</Label>
-                  <Textarea
-                    id="PreRequisitosDs"
-                    name="PreRequisitosDs"
-                    rows={3}
-                    value={form.PreRequisitosDs}
-                    onChange={handleChange}
-                    placeholder="Descreva os pré-requisitos necessários..."
-                  />
-                </div>
-              </CardContent>
-            </Card>
+            <WorkshopDetails form={form} onChange={handleFormChange} />
           </TabsContent>
 
           <TabsContent value="cronograma">
-            <Card>
-              <CardHeader>
-                <CardTitle>Programa do Curso</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div>
-                  <Label htmlFor="CronogramaDs">Cronograma/Programa</Label>
-                  <Textarea
-                    id="CronogramaDs"
-                    name="CronogramaDs"
-                    rows={8}
-                    value={form.CronogramaDs}
-                    onChange={handleChange}
-                    placeholder="Descreva o cronograma do curso, módulos, tópicos abordados..."
-                  />
-                  <p className="text-sm text-gray-500 mt-2">
-                    Dica: Use linhas separadas para cada módulo ou tópico
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <WorkshopSchedule form={form} onChange={handleFormChange} />
           </TabsContent>
 
           <TabsContent value="midia">
-            <div className="space-y-6">
-              {/* Imagem Principal Atual */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Imagem Principal Atual</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {imagemAtual ? (
-                    <div className="space-y-4">
-                      <div className="relative inline-block">
-                        <img
-                          src={getImageUrl(imagemAtual)}
-                          alt="Imagem principal atual"
-                          className="w-full max-w-md h-48 object-cover rounded-lg"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-2 right-2"
-                          onClick={handleRemoverImagemPrincipal}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        Para alterar, selecione uma nova imagem abaixo
-                      </p>
-                    </div>
-                  ) : (
-                    <p className="text-gray-500">Nenhuma imagem principal definida</p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Upload Nova Imagem Principal */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    <Upload className="h-5 w-5 inline mr-2" />
-                    {imagemAtual ? "Alterar Imagem Principal" : "Nova Imagem Principal"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Input
-                    id="ImagemBlob"
-                    name="ImagemBlob"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    Imagem que aparecerá como destaque do workshop
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Galeria Atual */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Galeria de Fotos Atual ({galeriaAtual.length} imagens)</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {galeriaAtual.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {galeriaAtual.map((imagem, index) => (
-                        <div key={imagem.id || imagem.IdGaleria || index} className="relative">
-                          <img
-                            src={getImageUrl(imagem.ImagemBlob || imagem.url)}
-                            alt={`Galeria ${index + 1}`}
-                            className="w-full h-32 object-cover rounded-lg"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="sm"
-                            className="absolute top-1 right-1"
-                            onClick={() => handleRemoverImagemGaleria(imagem)}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500">Nenhuma imagem na galeria</p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Upload Novas Imagens da Galeria */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    <Upload className="h-5 w-5 inline mr-2" />
-                    Adicionar à Galeria
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Input
-                    id="GaleriaImagens"
-                    name="GaleriaImagens"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleGaleriaChange}
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    Selecione múltiplas imagens para adicionar à galeria
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+            <WorkshopImageManager
+              imagemAtual={imagemAtual}
+              galeriaAtual={galeriaAtual}
+              onImagemFileChange={handleFileChange}
+              onGaleriaChange={handleGaleriaChange}
+              onRemoverImagemPrincipal={handleRemoverImagemPrincipal}
+              onRemoverImagemGaleria={handleRemoverImagemGaleria}
+              getImageUrl={getImageUrl}
+            />
           </TabsContent>
         </Tabs>
 
