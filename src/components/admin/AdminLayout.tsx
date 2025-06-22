@@ -1,7 +1,9 @@
+
 import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import AdminSidebar from "./AdminSidebar";
 import AdminHeader from "./AdminHeader";
+import { getAuthToken, removeAuthToken } from "@/utils/api";
 
 const AdminLayout = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -9,9 +11,40 @@ const AdminLayout = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const adminToken = localStorage.getItem("admin_token");
-    setIsAuthenticated(!!adminToken);
-    setIsLoading(false);
+    const validateToken = async () => {
+      const token = getAuthToken();
+      
+      if (!token) {
+        setIsAuthenticated(false);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        // Verificar se o token é válido fazendo uma requisição de teste
+        const response = await fetch("http://localhost:8000/api/user", {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          setIsAuthenticated(true);
+        } else {
+          // Token inválido, remover
+          removeAuthToken();
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error("Erro ao validar token:", error);
+        removeAuthToken();
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    validateToken();
   }, [location.pathname]);
 
   if (isLoading) {

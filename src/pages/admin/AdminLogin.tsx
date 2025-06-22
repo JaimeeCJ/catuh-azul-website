@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { setAuthToken } from "@/utils/api";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -17,23 +18,47 @@ const AdminLogin = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulação de login (substituir por autenticação real)
-    if (email === "admin@catuh.org" && password === "catuh2024") {
-      localStorage.setItem('admin_token', 'mock_token_' + Date.now());
-      toast({
-        title: "Login realizado com sucesso",
-        description: "Bem-vindo ao painel administrativo!",
+    try {
+      const response = await fetch("http://localhost:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          senha: password,
+        }),
       });
-      navigate('/admin');
-    } else {
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Salvar o token no localStorage
+        setAuthToken(data.token);
+        
+        toast({
+          title: "Login realizado com sucesso",
+          description: "Bem-vindo ao painel administrativo!",
+        });
+        navigate('/admin');
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Erro no login",
+          description: errorData.message || "Email ou senha incorretos.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Erro no login:", error);
       toast({
         title: "Erro no login",
-        description: "Email ou senha incorretos.",
+        description: "Erro de conexão. Tente novamente.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -58,7 +83,7 @@ const AdminLogin = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@catuh.org"
+                placeholder="admin@teste.com"
                 required
               />
             </div>
@@ -87,8 +112,8 @@ const AdminLogin = () => {
           
           <div className="mt-4 p-3 bg-gray-50 rounded text-sm text-gray-600">
             <strong>Credenciais de teste:</strong><br />
-            Email: admin@catuh.org<br />
-            Senha: catuh2024
+            Email: admin@teste.com<br />
+            Senha: senha123
           </div>
         </CardContent>
       </Card>

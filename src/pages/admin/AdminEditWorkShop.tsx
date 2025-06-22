@@ -1,10 +1,10 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye } from "lucide-react";
 import { useWorkshopData } from "@/hooks/useWorkshopData";
+import { apiRequest } from "@/utils/api";
 import WorkshopBasicInfo from "@/components/admin/workshop/WorkshopBasicInfo";
 import WorkshopDetails from "@/components/admin/workshop/WorkshopDetails";
 import WorkshopSchedule from "@/components/admin/workshop/WorkshopSchedule";
@@ -73,9 +73,10 @@ export default function AdminEditWorkshop() {
         formData.append(`GaleriaImagens[${index}]`, file);
       });
     
-      const res = await fetch(`http://localhost:8000/api/atividades/${id}`, {
+      const res = await apiRequest(`/atividades/${id}`, {
         method: "POST",
         body: formData,
+        isFormData: true,
       });
 
       if (!res.ok) throw new Error("Erro ao atualizar atividade");

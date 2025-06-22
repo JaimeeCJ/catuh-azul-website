@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
@@ -7,12 +6,15 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
+  // Controle para mostrar/ocultar a aba de contato
+  const showContactTab = false; // Altere para true se quiser mostrar novamente
+
   const navItems = [
     { name: "Início", path: "/" },
     { name: "Sobre", path: "/about" },
     { name: "Transparência", path: "/transparency" },
     { name: "Workshops", path: "/workshops" },
-    { name: "Contato", path: "/contact" },
+    ...(showContactTab ? [{ name: "Contato", path: "/contact" }] : []),
   ];
 
   const isActive = (path: string) => {

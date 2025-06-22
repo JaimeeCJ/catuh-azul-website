@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/utils/api";
 import CategoryForm from "@/components/admin/CategoryForm";
 import CategoryTable from "@/components/admin/CategoryTable";
 
@@ -21,7 +21,7 @@ const AdminCategories = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/categorias-documentos");
+      const response = await apiRequest("/categorias-documentos");
       if (response.ok) {
         const data = await response.json();
         setCategories(data);
@@ -53,18 +53,15 @@ const AdminCategories = () => {
     }
 
     try {
-      const url = isEditing 
-        ? `http://localhost:8000/api/categorias-documentos/${editingCategory?.id}`
-        : "http://localhost:8000/api/categorias-documentos";
+      const endpoint = isEditing 
+        ? `/categorias-documentos/${editingCategory?.id}`
+        : "/categorias-documentos";
       
       const method = isEditing ? "PUT" : "POST";
       
-      const response = await fetch(url, {
+      const response = await apiRequest(endpoint, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        body: formData,
       });
 
       if (response.ok) {
@@ -106,7 +103,7 @@ const AdminCategories = () => {
 
   const handleDelete = async (categoryId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/categorias-documentos/${categoryId}`, {
+      const response = await apiRequest(`/categorias-documentos/${categoryId}`, {
         method: "DELETE",
       });
 

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { apiRequest } from "@/utils/api";
 
 const API_URL = "http://localhost:8000/api/atividades";
 
@@ -29,7 +29,7 @@ const AdminWorkshops = () => {
   // Fetch activities from Laravel API
   useEffect(() => {
     setLoading(true);
-    fetch(API_URL)
+    apiRequest("/atividades")
       .then((res) => res.json())
       .then((data) => setWorkshops(data))
       .finally(() => setLoading(false));
@@ -47,10 +47,9 @@ const AdminWorkshops = () => {
   // Add new activity via API (POST)
   async function handleSaveWorkshop(e) {
     e.preventDefault();
-    const res = await fetch(API_URL, {
+    const res = await apiRequest("/atividades", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: form,
     });
     if (res.ok) {
       const novo = await res.json();
@@ -80,7 +79,9 @@ const AdminWorkshops = () => {
 
   // Deleta atividade via API
   async function handleDeleteWorkshop(atividadeId) {
-    const res = await fetch(`${API_URL}/${atividadeId}`, { method: "DELETE" });
+    const res = await apiRequest(`/atividades/${atividadeId}`, { 
+      method: "DELETE" 
+    });
     if (res.ok) {
       setWorkshops(workshops.filter((w) => w.AtividadeId !== atividadeId));
       toast({

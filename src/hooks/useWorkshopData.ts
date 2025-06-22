@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/utils/api";
 
 export interface WorkshopForm {
   TituloTx: string;
@@ -50,8 +51,8 @@ export const useWorkshopData = (id: string) => {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      fetch(`http://localhost:8000/api/atividades/${id}`),
-      fetch(`http://localhost:8000/api/atividades/${id}/galeria`).catch(() => ({ json: () => [] }))
+      apiRequest(`/atividades/${id}`),
+      apiRequest(`/atividades/${id}/galeria`).catch(() => ({ json: () => [] }))
     ]).then(async ([atividadeRes, galeriaRes]) => {
       if (!atividadeRes.ok) throw new Error("Atividade não encontrada");
       
@@ -107,7 +108,7 @@ export const useWorkshopData = (id: string) => {
     }
 
     try {
-      const res = await fetch(`http://localhost:8000/api/galeria/${imagemId}`, {
+      const res = await apiRequest(`/galeria/${imagemId}`, {
         method: "DELETE",
       });
 

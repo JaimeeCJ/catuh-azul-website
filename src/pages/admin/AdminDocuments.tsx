@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Upload, Download, Trash2, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/utils/api";
 import {
   Select,
   SelectContent,
@@ -41,7 +41,7 @@ const AdminDocuments = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/documentos");
+      const response = await apiRequest("/documentos");
       if (response.ok) {
         const data = await response.json();
         setDocuments(data);
@@ -58,7 +58,7 @@ const AdminDocuments = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/categorias-documentos");
+      const response = await apiRequest("/categorias-documentos");
       if (response.ok) {
         const data = await response.json();
         setCategories(data);
@@ -103,9 +103,10 @@ const AdminDocuments = () => {
     formData.append("documento", file);
 
     try {
-      const response = await fetch("http://localhost:8000/api/documentos", {
+      const response = await apiRequest("/documentos", {
         method: "POST",
         body: formData,
+        isFormData: true,
       });
 
       if (response.ok) {
@@ -135,7 +136,7 @@ const AdminDocuments = () => {
 
   const handleDelete = async (documentId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/documentos/${documentId}`, {
+      const response = await apiRequest(`/documentos/${documentId}`, {
         method: "DELETE",
       });
 
