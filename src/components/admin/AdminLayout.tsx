@@ -14,6 +14,8 @@ const AdminLayout = () => {
     const validateToken = async () => {
       const token = getAuthToken();
       
+      console.log("Validando token:", token ? "Token encontrado" : "Token não encontrado");
+      
       if (!token) {
         setIsAuthenticated(false);
         setIsLoading(false);
@@ -28,10 +30,14 @@ const AdminLayout = () => {
           },
         });
 
+        console.log("Resposta da validação:", response.status);
+
         if (response.ok) {
           setIsAuthenticated(true);
+          console.log("Token válido, usuário autenticado");
         } else {
           // Token inválido, remover
+          console.log("Token inválido, removendo");
           removeAuthToken();
           setIsAuthenticated(false);
         }
@@ -47,6 +53,8 @@ const AdminLayout = () => {
     validateToken();
   }, [location.pathname]);
 
+  console.log("Estado atual - isLoading:", isLoading, "isAuthenticated:", isAuthenticated, "pathname:", location.pathname);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -60,20 +68,24 @@ const AdminLayout = () => {
 
   // Se estiver autenticado e na login, redireciona
   if (isAuthenticated && location.pathname === "/admin/login") {
+    console.log("Usuário autenticado tentando acessar login, redirecionando para dashboard");
     return <Navigate to="/admin" replace />;
   }
 
   // Se não autenticado e não estiver na login, redireciona pra login
   if (!isAuthenticated && location.pathname !== "/admin/login") {
+    console.log("Usuário não autenticado, redirecionando para login");
     return <Navigate to="/admin/login" replace />;
   }
 
   // Aqui é só pra rota de login
   if (!isAuthenticated && location.pathname === "/admin/login") {
+    console.log("Exibindo tela de login");
     return <Outlet />;
   }
 
   // Aqui é pra qualquer rota autenticada
+  console.log("Exibindo layout autenticado");
   return (
     <div className="min-h-screen bg-gray-50 flex">
       <AdminSidebar />

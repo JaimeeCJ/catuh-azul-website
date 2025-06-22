@@ -40,7 +40,9 @@ const AdminLogin = () => {
           title: "Login realizado com sucesso",
           description: "Bem-vindo ao painel administrativo!",
         });
-        navigate('/admin');
+        
+        // Forçar recarregamento da página para que o AdminLayout re-valide a autenticação
+        window.location.href = '/admin';
       } else {
         const errorData = await response.json();
         toast({
@@ -83,7 +85,7 @@ const AdminLogin = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@teste.com"
+                placeholder="Digite seu email"
                 required
               />
             </div>
@@ -109,12 +111,6 @@ const AdminLogin = () => {
               {isLoading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
-          
-          <div className="mt-4 p-3 bg-gray-50 rounded text-sm text-gray-600">
-            <strong>Credenciais de teste:</strong><br />
-            Email: admin@teste.com<br />
-            Senha: senha123
-          </div>
         </CardContent>
       </Card>
     </div>
