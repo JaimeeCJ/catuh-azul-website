@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -42,26 +43,6 @@ const Home = () => {
             Conheça Nosso Trabalho
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
-        </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="py-16 bg-primary-dark text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="font-montserrat font-bold text-3xl md:text-4xl mb-6">
-            Faça Parte da Nossa Missão
-          </h2>
-          <p className="font-inter text-lg mb-8 max-w-2xl mx-auto">
-            Junte-se a nós nesta jornada de transformação social. Seja através de doações, voluntariado ou participação em nossos programas.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="font-montserrat font-semibold">
-              Seja Voluntário
-            </Button>
-            <Button size="lg" variant="outline" className="border-white text-black hover:bg-white hover:text-primary-dark font-montserrat font-semibold">
-              Entre em Contato
-            </Button>
-          </div>
         </div>
       </section>
     </div>
