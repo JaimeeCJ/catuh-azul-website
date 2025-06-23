@@ -188,7 +188,7 @@ const Workshops = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-16 bg-primary-dark text-white">
+      {/* <section className="py-16 bg-primary-dark text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="font-montserrat font-bold text-3xl mb-6">
             Pronto para Começar?
@@ -204,7 +204,7 @@ const Workshops = () => {
             Fale Conosco
           </Button>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };
