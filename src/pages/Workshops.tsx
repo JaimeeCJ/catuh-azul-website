@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -58,7 +57,7 @@ const Workshops = () => {
         <CardHeader>
           <div className="flex items-center justify-between mb-2">
             <span className="text-4xl">{emoji}</span>
-            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-montserrat font-medium">
+            <span className="bg-primary-light text-primary-dark px-3 py-1 rounded-full text-xs font-montserrat font-medium">
               {category}
             </span>
           </div>
@@ -104,7 +103,7 @@ const Workshops = () => {
   return (
     <div className="animate-fade-in">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-16">
+      <section className="bg-gradient-to-r from-primary-light to-primary-dark text-white py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="font-montserrat font-bold text-4xl md:text-5xl mb-6">
             Workshops & Cursos
@@ -120,8 +119,8 @@ const Workshops = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <BookOpen className="h-8 w-8 text-blue-600" />
+              <div className="w-16 h-16 bg-primary-light rounded-full flex items-center justify-center mb-4">
+                <BookOpen className="h-8 w-8 text-primary-dark" />
               </div>
               <h3 className="font-montserrat font-semibold text-lg mb-2">Cursos Gratuitos</h3>
               <p className="font-inter text-gray-600">
@@ -129,8 +128,8 @@ const Workshops = () => {
               </p>
             </div>
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <Users className="h-8 w-8 text-blue-600" />
+              <div className="w-16 h-16 bg-primary-light rounded-full flex items-center justify-center mb-4">
+                <Users className="h-8 w-8 text-primary-dark" />
               </div>
               <h3 className="font-montserrat font-semibold text-lg mb-2">Para Todos</h3>
               <p className="font-inter text-gray-600">
@@ -138,8 +137,8 @@ const Workshops = () => {
               </p>
             </div>
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <Clock className="h-8 w-8 text-blue-600" />
+              <div className="w-16 h-16 bg-primary-light rounded-full flex items-center justify-center mb-4">
+                <Clock className="h-8 w-8 text-primary-dark" />
               </div>
               <h3 className="font-montserrat font-semibold text-lg mb-2">Horários Flexíveis</h3>
               <p className="font-inter text-gray-600">
@@ -164,7 +163,7 @@ const Workshops = () => {
 
           {loading ? (
             <div className="text-center py-12">
-              <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+              <div className="w-16 h-16 border-4 border-primary-light border-t-primary-dark rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-gray-600">Carregando workshops...</p>
             </div>
           ) : workshops.length === 0 ? (
@@ -189,7 +188,7 @@ const Workshops = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-16 bg-blue-800 text-white">
+      <section className="py-16 bg-primary-dark text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="font-montserrat font-bold text-3xl mb-6">
             Pronto para Começar?
@@ -201,7 +200,6 @@ const Workshops = () => {
             size="lg" 
             variant="secondary" 
             className="font-montserrat font-semibold"
-            onClick={() => navigate("/contact")}
           >
             Fale Conosco
           </Button>

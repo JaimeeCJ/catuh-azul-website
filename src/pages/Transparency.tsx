@@ -137,7 +137,7 @@ const Transparency = () => {
           </div>
         </section>
         
-        <section className="py-12 sm:py-16">
+        <section className="py-12 sm:py-16 pb-24">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-center min-h-[400px]">
               <div className="text-center">
@@ -166,7 +166,7 @@ const Transparency = () => {
       </section>
 
       {/* Documents Section */}
-      <section className="py-12 sm:py-16">
+      <section className="py-12 sm:py-16 pb-24">
         <div className="container mx-auto px-4">
           {categories.length === 0 ? (
             <div className="text-center py-12">
