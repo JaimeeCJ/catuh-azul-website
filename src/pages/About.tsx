@@ -1,4 +1,3 @@
-
 const About = () => {
   return (
     <div className="animate-fade-in">
@@ -24,18 +23,19 @@ const About = () => {
               </h2>
               <div className="space-y-4 font-inter text-gray-700">
                 <p>
-                  A Casa Assistencial Trabalhadores da Última Hora foi fundada com o propósito de oferecer apoio integral à comunidade de Barretos, especialmente àqueles em situação de vulnerabilidade social.
+                 Fundada em 10 de outubro de 2000, a Casa Assistencial Trabalhadores da Última Hora (CATUH) nasceu do desejo de acolher e transformar vidas. Com sede em Barretos/SP, nossa instituição é uma associação civil sem fins lucrativos, de caráter filantrópico e apartidário, dedicada a atender crianças, adolescentes, jovens e famílias em situação de vulnerabilidade social. 
                 </p>
                 <p>
-                  Ao longo dos anos, nossa organização tem se dedicado a promover a dignidade humana através de programas assistenciais, educacionais e de capacitação profissional, sempre pautados nos valores cristãos de amor, solidariedade e justiça social.
-                </p>
-                <p>
-                  Com o apoio da comunidade local e de parceiros comprometidos com nossa causa, conseguimos expandir nossos serviços e alcançar cada vez mais famílias necessitadas.
+                 Desde o início, atuamos com comprometimento e sensibilidade, oferecendo apoio emergencial e promovendo vínculos familiares e comunitários, sempre buscando a inclusão e o desenvolvimento integral dos assistidos.
                 </p>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-primary-light/20 to-primary-dark/20 rounded-lg p-8 h-80 flex items-center justify-center">
-              <span className="font-montserrat text-primary-dark text-6xl">📖</span>
+            <div className="bg-gradient-to-br from-primary-light/20 to-primary-dark/20 rounded-lg p-0 h-80 w-full overflow-hidden">
+              <img 
+                src="frente.jpg" 
+                alt="Nossa História" 
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </div>
@@ -51,7 +51,7 @@ const About = () => {
               </div>
               <h3 className="font-montserrat font-bold text-xl text-primary-dark mb-4">Missão</h3>
               <p className="font-inter text-gray-700">
-                Promover o desenvolvimento humano e social através de ações assistenciais, educacionais e de capacitação, contribuindo para uma sociedade mais justa e solidária.
+                Promover acolhimento, formação e desenvolvimento para crianças, adolescentes, jovens e famílias em situação de vulnerabilidade social, fortalecendo vínculos, ampliando oportunidades e contribuindo para a construção de uma sociedade mais justa, solidária e humana.
               </p>
             </div>
 
@@ -61,7 +61,7 @@ const About = () => {
               </div>
               <h3 className="font-montserrat font-bold text-xl text-primary-dark mb-4">Visão</h3>
               <p className="font-inter text-gray-700">
-                Ser reconhecida como uma organização de referência na promoção do desenvolvimento social e na transformação de vidas na região de Barretos.
+                Ser reconhecida como uma instituição de referência em assistência social e formação cidadã, contribuindo ativamente para a transformação social e a emancipação de indivíduos e comunidades em Barretos e região.
               </p>
             </div>
 
@@ -71,8 +71,8 @@ const About = () => {
               </div>
               <h3 className="font-montserrat font-bold text-xl text-primary-dark mb-4">Valores</h3>
               <p className="font-inter text-gray-700">
-                Amor ao próximo, solidariedade, transparência, respeito à dignidade humana, compromisso social e ética em todas as nossas ações.
-              </p>
+                Solidariedade, Compromisso Social, Respeito, Educação e Formação, Parceria e Transparência. 
+                </p>
             </div>
           </div>
         </div>
@@ -85,14 +85,22 @@ const About = () => {
             Nossas Instalações
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((item) => (
-              <div key={item} className="bg-gradient-to-br from-primary-light/30 to-primary-dark/30 rounded-lg h-64 flex items-center justify-center">
-                <span className="font-montserrat text-primary-dark text-4xl">🏢</span>
+            {["aula-1.jpg", "aula-2.jpg", "img1.jpg"].map((nome, index) => (
+              <div
+                key={index}
+                className="rounded-lg h-64 w-full overflow-hidden shadow-lg"
+              >
+                <img
+                  src={`${nome}`}
+                  alt={`Instalação ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
               </div>
             ))}
           </div>
         </div>
       </section>
+
     </div>
   );
 };

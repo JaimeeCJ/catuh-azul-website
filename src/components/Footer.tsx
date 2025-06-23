@@ -43,7 +43,7 @@ const Footer = () => {
             <div className="space-y-2 font-inter text-gray-300">
               <p>Barretos, São Paulo</p>
               <p>trabalhadoresultimahora@hotmail.com</p>
-              <p>(17) 3322-1234</p>
+              <p>(17) 98145-0283</p>
             </div>
             
             {/* Social Media */}
