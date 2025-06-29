@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Upload, Download, Trash2, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/utils/api";
+import { API_BASE_URL } from '@/utils/api';
 import {
   Select,
   SelectContent,
@@ -160,7 +161,7 @@ const AdminDocuments = () => {
   };
 
   const handleDownload = (document: Document) => {
-    const downloadUrl = `http://localhost:8000/storage/${document.caminho}`;
+    const downloadUrl = `${API_BASE_URL}/storage/${document.caminho}`;
     window.open(downloadUrl, '_blank');
   };
 

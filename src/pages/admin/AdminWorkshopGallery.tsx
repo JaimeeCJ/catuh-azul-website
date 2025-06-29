@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Upload, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { API_BASE_URL } from '@/utils/api';
 
 interface GaleriaItem {
   id: number;
@@ -32,8 +33,8 @@ export default function AdminWorkshopGallery() {
     
     // Carregar dados do workshop
     Promise.all([
-      fetch(`http://localhost:8000/api/atividades/${id}`).then(res => res.json()),
-      fetch(`http://localhost:8000/api/atividades/${id}/galeria`).then(res => res.json()).catch(() => [])
+      fetch(`${API_BASE_URL}/api/atividades/${id}`).then(res => res.json()),
+      fetch(`${API_BASE_URL}/api/atividades/${id}/galeria`).then(res => res.json()).catch(() => [])
     ]).then(([workshopData, galeriaData]) => {
       setWorkshop(workshopData);
       setGaleria(galeriaData);
@@ -49,7 +50,7 @@ export default function AdminWorkshopGallery() {
     });
 
     try {
-      const res = await fetch(`http://localhost:8000/api/atividades/${id}/galeria`, {
+      const res = await fetch(`${API_BASE_URL}/api/atividades/${id}/galeria`, {
         method: "POST",
         body: formData,
       });
@@ -74,7 +75,7 @@ export default function AdminWorkshopGallery() {
 
   const handleRemoverImagem = async (imagemId: number) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/galeria/${imagemId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/galeria/${imagemId}`, {
         method: "DELETE",
       });
 
@@ -96,7 +97,7 @@ export default function AdminWorkshopGallery() {
 
   const handleSalvarLegenda = async (imagemId: number) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/galeria/${imagemId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/galeria/${imagemId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ legenda: legendaTemp }),
@@ -137,7 +138,7 @@ export default function AdminWorkshopGallery() {
 
     // Salvar nova ordem na API
     try {
-      await fetch(`http://localhost:8000/api/atividades/${id}/galeria/reordenar`, {
+      await fetch(`${API_BASE_URL}/api/atividades/${id}/galeria/reordenar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 

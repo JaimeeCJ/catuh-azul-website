@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, Users, BookOpen } from "lucide-react";
+import { API_BASE_URL } from '@/utils/api';
 
 const Workshops = () => {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ const Workshops = () => {
 
   // Fetch workshops from API
   useEffect(() => {
-    fetch("http://localhost:8000/api/atividades")
+    fetch(`${API_BASE_URL}/api/atividades`)
       .then(res => res.json())
       .then(data => {
         // Filtra apenas workshops ativos

@@ -8,8 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { apiRequest } from "@/utils/api";
 
-const API_URL = "http://localhost:8000/api/atividades";
-
 const AdminWorkshops = () => {
   const { toast } = useToast();
   const navigate = useNavigate();

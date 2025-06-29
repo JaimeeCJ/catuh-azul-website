@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { setAuthToken } from "@/utils/api";
+import { API_BASE_URL } from '@/utils/api';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -19,7 +20,7 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/api/login", {
+      const response = await fetch(`${API_BASE_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

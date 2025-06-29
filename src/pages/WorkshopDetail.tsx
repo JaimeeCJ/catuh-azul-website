@@ -13,6 +13,7 @@ import WorkshopGallery from "@/components/workshop-detail/WorkshopGallery";
 import WorkshopInfo from "@/components/workshop-detail/WorkshopInfo";
 import WorkshopCTA from "@/components/workshop-detail/WorkshopCTA";
 import WorkshopRequirements from "@/components/workshop-detail/WorkshopRequirements";
+import { API_BASE_URL } from '@/utils/api';
 
 const WorkshopDetail = () => {
   const { id } = useParams();
@@ -26,7 +27,7 @@ const WorkshopDetail = () => {
     if (!id) return;
     
     setLoading(true);
-    fetch(`http://localhost:8000/api/atividades/${id}`)
+    fetch(`${API_BASE_URL}/api/atividades/${id}`)
       .then(res => {
         if (!res.ok) throw new Error("Workshop não encontrado");
         return res.json();
@@ -60,7 +61,7 @@ const WorkshopDetail = () => {
   // Função para obter URL completa da imagem
   const getImageUrl = (imagePath) => {
     if (!imagePath) return null;
-    return `http://localhost:8000/storage/${imagePath}`;
+    return `${API_BASE_URL}/storage/${imagePath}`;
   };
 
   if (loading) {

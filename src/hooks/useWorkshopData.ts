@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/utils/api";
+import { API_BASE_URL } from '@/utils/api';
 
 export interface WorkshopForm {
   TituloTx: string;
@@ -45,7 +46,7 @@ export const useWorkshopData = (id: string) => {
   const getImageUrl = (imagePath: string) => {
     if (!imagePath) return "";
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:8000/storage/${imagePath}`;
+    return `${API_BASE_URL}/storage/${imagePath}`;
   };
 
   useEffect(() => {

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Download } from "lucide-react";
+import { API_BASE_URL } from '@/utils/api';
 
 interface Document {
   id: number;
@@ -30,7 +31,7 @@ const Transparency = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/documentos");
+      const response = await fetch(`${API_BASE_URL}/api/documentos`);
       if (response.ok) {
         const data = await response.json();
         setDocuments(data);
@@ -42,7 +43,7 @@ const Transparency = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/categorias-documentos");
+      const response = await fetch(`${API_BASE_URL}/api/categorias-documentos`);
       if (response.ok) {
         const data = await response.json();
         setCategories(data);
@@ -69,7 +70,7 @@ const Transparency = () => {
   };
 
   const handleDownload = (document: Document) => {
-    const downloadUrl = `http://localhost:8000/storage/${document.caminho}`;
+    const downloadUrl = `${API_BASE_URL}/storage/${document.caminho}`;
     window.open(downloadUrl, '_blank');
   };
 

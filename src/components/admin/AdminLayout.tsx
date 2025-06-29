@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import AdminSidebar from "./AdminSidebar";
 import AdminHeader from "./AdminHeader";
 import { getAuthToken, removeAuthToken } from "@/utils/api";
+import { API_BASE_URL } from '@/utils/api';
 
 const AdminLayout = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -24,7 +25,7 @@ const AdminLayout = () => {
 
       try {
         // Verificar se o token é válido fazendo uma requisição de teste
-        const response = await fetch("http://localhost:8000/api/me", {
+        const response = await fetch(`${API_BASE_URL}/api/me`, {
           headers: {
             "Authorization": `Bearer ${token}`,
           },
