@@ -12,7 +12,7 @@ const Workshops = () => {
 
   // Fetch workshops from API
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/atividades`)
+    fetch(`${API_BASE_URL}/atividades`)
       .then(res => res.json())
       .then(data => {
         // Filtra apenas workshops ativos

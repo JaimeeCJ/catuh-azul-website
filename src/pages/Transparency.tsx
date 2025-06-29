@@ -31,7 +31,7 @@ const Transparency = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/documentos`);
+      const response = await fetch(`${API_BASE_URL}/documentos`);
       if (response.ok) {
         const data = await response.json();
         setDocuments(data);
@@ -43,7 +43,7 @@ const Transparency = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/categorias-documentos`);
+      const response = await fetch(`${API_BASE_URL}/categorias-documentos`);
       if (response.ok) {
         const data = await response.json();
         setCategories(data);

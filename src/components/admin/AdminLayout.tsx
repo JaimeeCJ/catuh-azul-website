@@ -25,7 +25,7 @@ const AdminLayout = () => {
 
       try {
         // Verificar se o token é válido fazendo uma requisição de teste
-        const response = await fetch(`${API_BASE_URL}/api/me`, {
+        const response = await fetch(`${API_BASE_URL}/me`, {
           headers: {
             "Authorization": `Bearer ${token}`,
           },

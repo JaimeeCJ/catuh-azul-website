@@ -27,7 +27,7 @@ const WorkshopDetail = () => {
     if (!id) return;
     
     setLoading(true);
-    fetch(`${API_BASE_URL}/api/atividades/${id}`)
+    fetch(`${API_BASE_URL}/atividades/${id}`)
       .then(res => {
         if (!res.ok) throw new Error("Workshop não encontrado");
         return res.json();
